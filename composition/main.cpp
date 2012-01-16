@@ -12,6 +12,11 @@
 #include <functional>
 #include <type_traits>
 
+#define TEST1 0
+#define TEST2 0
+#define TEST3 0
+#define TEST4 1
+
 namespace str {
 
 using std::string;
@@ -48,34 +53,39 @@ string unlines(const strings& elems) {
 
 namespace cmp {
 
-/*
-template <class T> struct function_arity;
+///////////////////////////////////////////////////////////////////////////
 
-template <class R>
-struct function_arity<R()>{static const int value = 0;};
-
-// for N=1..N_max do
-template <class R,class T1>
-struct function_arity<R(T1)>{static const int value = 1;};
-
-template <class R,class T1,class T2>
-struct function_arity<R(T1,T2)>{static const int value = 2;};
-
-template <class R,class T1,class T2,class T3>
-struct function_arity<R(T1,T2,T3)>{static const int value = 3;};
-
-template <class R,class T1,class T2,class T3,class T4>
-struct function_arity<R(T1,T2,T3,T4){static const int value = 4;};
-*/
-
-// etc
-/*template <typename T>
-typename std::add_rvalue_reference<T>::type declval();*/
-
-  /*
 template <typename T>
-struct function_traits : public function_traits< decltype( &T::operator() ) >
+typename std::add_rvalue_reference<T>::type declval();
+
+///////////////////////////////////////////////////////////////////////////
+
+#if 0
+template <typename T> struct function_arity;
+
+template <typename R, typename C>
+struct function_arity<R(C::*)()>{ enum { arity = 0 }; };
+
+template <typename R, typename C,typename T1>
+struct function_arity<R(C::*)(T1)>{ enum { arity = 1 }; };
+
+template <typename R, typename C,typename T1,typename T2>
+struct function_arity<R(C::*)(T1,T2)>{ enum { arity = 2 }; };
+
+template <typename R, typename C,typename T1,typename T2,typename T3>
+struct function_arity<R(C::*)(T1,T2,T3)>{ enum { arity = 3 }; };
+
+template <typename R, typename C,typename T1,typename T2,typename T3,typename T4>
+struct function_arity<R(C::*)(T1,T2,T3,T4)>{ enum { arity = 4 }; };
+
+template<typename Functor, size_t NArgs, typename Return>
+struct count_arg : std::enable_if<function_arity<Functor>::arity==NArgs, Return>
 {};
+
+#else
+
+template <typename T>
+struct function_traits : public function_traits< decltype( &T::operator() ) > {};
 
 template <typename C, typename R, typename T0>
 struct function_traits<R(C::*)(T0) const> { enum { arity = 1 }; };
@@ -86,204 +96,203 @@ struct function_traits<R(C::*)(T0,T1) const> { enum { arity = 2 }; };
 template <typename C, typename R, typename T0, typename T1, typename T2>
 struct function_traits<R(C::*)(T0,T1,T2) const> { enum { arity = 3 }; };
 
-template<typename Functor, size_t NArgs>
-struct count_arg : std::enable_if<function_traits<Functor>::arity==NArgs, int>
+template <typename R, typename T0>
+struct function_traits<std::function<R(T0)> > { enum { arity = 1 }; };
+
+template <typename R, typename T0, typename T1>
+struct function_traits<std::function<R(T0,T1)> > { enum { arity = 2 }; };
+
+template <typename R, typename T0, typename T1, typename T2>
+struct function_traits<std::function<R(T0,T1,T2)> > { enum { arity = 3 }; };
+
+template<typename Functor, size_t NArgs, typename Return>
+struct count_arg : std::enable_if<function_traits<Functor>::arity==NArgs, Return>
 {};
 
-template<class F, class G>
-class composed {
-public:
+#endif
 
-  enum { arity = function_traits<G>::arity };
-
-  composed(F f_, G g_) : f(f_), g(g_) { }
-
-  template< class F0, class G0 >
-  struct T0Arg { 
-    //typedef typename std::result_of< declval<F0>(declval<G0>()) >::type type; 
-    typedef typename std::result_of< G0() >::type U;
-    typedef typename std::result_of< F(U) >::type type;
-  };
-
-  template< class F0, class G0, class T1 >
-  struct T1Arg { 
-    //typedef typename std::result_of< declval<F0>(declval<G0>()) >::type type; 
-    typedef typename std::result_of< G0(T1) >::type U;
-    typedef typename std::result_of< F(U) >::type type;
-  };
-
-  template< class F0, class G0, class T1, class T2 >
-  struct T2Arg { 
-    //typedef typename std::result_of< declval<F0>(declval<G0>()) >::type type; 
-    typedef typename std::result_of< G0(T1, T2) >::type U;
-    typedef typename std::result_of< F(U) >::type type;
-  };
-
-  template< class F0, class G0, class T1, class T2, class T3 >
-  struct T3Arg { 
-    //typedef typename std::result_of< declval<F0>(declval<G0>()) >::type type; 
-    typedef typename std::result_of< G0(T1, T2, T3) >::type U;
-    typedef typename std::result_of< F(U) >::type type;
-  };
-
-  typename std::enable_if<(0==arity) && std::is_same<typename T0Arg<F,G>::type,void>::value, typename T0Arg<F,G>::type >::type 
-    operator()() {
-      f(g());
-      //f();
-  }
-
-  template<typename T1>
-  typename std::enable_if<1==arity, typename T1Arg<F,G,T1>::type >::type 
-    operator()(const T1& t1) {
-      return f(g(t1));
-  }
-
-  template<typename T1, typename T2>
-  typename std::enable_if<2==arity, typename T2Arg<F,G,T1,T2>::type >::type 
-    operator()(const T1& t1, const T2& t2) {
-      return f(g(t1,t2));
-  }
-
-  template<typename T1, typename T2, typename T3>
-  typename std::enable_if<3==arity, typename T3Arg<F,G,T1,T2,T3>::type >::type 
-    operator()(const T1& t1, const T1& t2, const T1& t3) {
-      return f(g(t1,t2,t3));
-  }
-
-private:
-  F f;
-  G g;
-};
-
-template<class F, class G>
-composed<F,G> compose(F f, G g) {
-  return composed<F,G>(f, g);
-}
-
-template<class F, class G>
-composed<F,G> compose(F f, G g) {
-  return compose<F,G,function_traits<G>::arity>(f, g);
-}*/
-
-
-template <typename T>
-struct function_traits : public function_traits<decltype(&T::operator())>
-{};
-
-template <typename C, typename R, typename T0>
-struct function_traits<R(C::*)(T0) const> { enum { arity = 1 }; };
-
-template <typename C, typename R, typename T0, typename T1>
-struct function_traits<R(C::*)(T0,T1) const> { enum { arity = 2 }; };
-
-template <typename C, typename R, typename T0, typename T1, typename T2>
-struct function_traits<R(C::*)(T0,T1,T2) const> { enum { arity = 3 }; };
-
-template<typename Functor, size_t NArgs>
-struct count_arg : std::enable_if<function_traits<Functor>::arity==NArgs, int>
-{};
+///////////////////////////////////////////////////////////////////////////
 
 template<class F, class G>
 class composed_base {
 public:
   composed_base(F f_, G g_) : f(f_), g(g_) { }
 
+  template< typename Composed >
+  auto compose(Composed c) -> decltype( ::compose(::compose(f,g),c) ) {
+    return ::compose(::compose(f,g),c);
+  }
+
+  template< typename Composed >
+  auto operator+(Composed c) -> decltype( ::compose(::compose(f,g),c) ) {
+    return this->compose(c);
+  }
+
 protected:
   F f;
   G g;
 };
 
+///////////////////////////////////////////////////////////////////////////
+
 template<class F, class G, size_t ArgC = 0>
 class composed : public composed_base<F,G> {
-  typedef typename std::result_of< G() >::type U;
-  typedef typename std::result_of< F(U) >::type type;
+  template<typename F, typename G>
+  struct result
+  {
+    typedef decltype( declval<G>().operator()() ) U;
+    typedef decltype( declval<F>().operator()(declval<U>()) ) type;
+  };
 
 public:
   composed(F f_, G g_) : composed_base<F,G>(f_,g_) { }
-  type operator()() { return f(g()); }
+  auto operator()() -> typename result<F,G>::type { return f(g()); }
 };
 
+///////////////////////////////////////////////////////////////////////////
 
 template<class F, class G>
 class composed<F,G,1> : public composed_base<F,G> {
-  template< class F0, class G0, class T1 >
-  struct T1Arg { 
-    //typedef typename std::result_of< declval<F0>(declval<G0>()) >::type type; 
-    typedef typename std::result_of< G0(T1) >::type U;
-    typedef typename std::result_of< F(U) >::type type;
+  template<typename F, typename G, typename T1>
+  struct result
+  {
+    typedef decltype( declval<G>().operator()(declval<T1>()) ) U;
+    typedef decltype( declval<F>().operator()(declval<U>()) ) type;
   };
 
 public:
   composed(F f_, G g_) : composed_base<F,G>(f_,g_) { }
 
-  template<typename T>
-  typename T1Arg<F,G,T>::type operator()(const T& t1) { return f(g(t1)); }
+  template<typename T1>
+  auto operator()(const T1& t) -> typename result<F,G,T1>::type {
+    return f(g(t));
+  }
 };
+
+///////////////////////////////////////////////////////////////////////////
 
 template<class F, class G>
 class composed<F,G,2> : public composed_base<F,G> {
-  template< class F0, class G0, class T1, class T2 >
-  struct T2Arg { 
-    typedef typename std::result_of< G0(T1,T2) >::type U;
-    typedef typename std::result_of< F(U) >::type type;
+  template<typename F, typename G, typename T1, typename T2>
+  struct result
+  {
+    typedef decltype( declval<G>().operator()(declval<T1>(), declval<T2>()) ) U;
+    typedef decltype( declval<F>().operator()(declval<U>()) ) type;
   };
 
 public:
   composed(F f_, G g_) : composed_base<F,G>(f_,g_) { }
 
   template<typename T1, typename T2>
-  typename T2Arg<F,G,T1,T2>::type operator()(const T1& t1, const T2& t2) { return f(g(t1,t2)); }
+  auto operator()(const T1& t1, const T2& t2) -> typename result<F,G,T1,T2>::type {
+    return f(g(t1,t2));
+  }
 };
+
+///////////////////////////////////////////////////////////////////////////
 
 template<class F, class G>
 class composed<F,G,3> : public composed_base<F,G> {
-  template< class F0, class G0, class T1, class T2, class T3 >
-  struct T3Arg { 
-    typedef typename std::result_of< G0(T1,T2,T3) >::type U;
-    typedef typename std::result_of< F(U) >::type type;
+  template<typename F, typename G, typename T1, typename T2, typename T3>
+  struct result
+  {
+    typedef decltype( declval<G>().operator()(declval<T1>(), declval<T2>(), declval<T3>()) ) U;
+    typedef decltype( declval<F>().operator()(declval<U>()) ) type;
   };
 
 public:
   composed(F f_, G g_) : composed_base<F,G>(f_,g_) { }
 
   template<typename T1, typename T2, typename T3>
-  typename T3Arg<F,G,T1,T2,T3>::type operator()(const T1& t1, const T2& t2, const T3& t3) { return f(g(t1,t2,t3)); }
+  auto operator()(const T1& t1, const T2& t2, const T3& t3) -> typename result<F,G,T1,T2,T3>::type {
+    return f(g(t1,t2,t3));
+  }
 };
 
-/*
-template<class F, class G>
-composed<F,G,function_traits<G>::arity> compose(F f, G g) {
-  return composed<F,G>(f, g);
+///////////////////////////////////////////////////////////////////////////
+
+template<typename F, typename G>
+typename count_arg<G, 0, composed<F,G,0> >::type compose(F f, G g) {
+  return composed<F,G,0>(f, g);
 }
-*/
-template<class F, class G>
-auto compose(F f, G g) -> decltype(composed<F,G,function_traits<G>::arity>) {
-  return composed<F,G>(f, g);
+
+template<typename F, typename G>
+typename count_arg<G, 1, composed<F,G,1> >::type compose(F f, G g) {
+  return composed<F,G,1>(f, g);
 }
+
+template<typename F, typename G>
+typename count_arg<G, 4, composed<F,G,4> >::type compose(F f, G g) {
+  return composed<F,G,4>(f, g);
+}
+
+template<typename F, typename G>
+typename count_arg<G, 3, composed<F,G,3> >::type compose(F f, G g) {
+  return composed<F,G,3>(f, g);
+}
+
+#define COMPOSE (f,g)       compose((f),(g))
+#define COMPOSE2(h,f,g)     compose(compose(h,f),g)
+#define COMPOSE3(i,h,f,g)   compose(compose(compose(i,h),f),g)
 
 }
 
 bool hello() { std::cout << "Hello "; return true; }
 void world(bool print) { if(print) std::cout << " World "; }
- 
+
+using namespace cmp;
+
+void test() {
+  {
+    std::function<bool(void)> g = hello;
+    std::function<void(bool)> f = world;
+    //auto fg = compose(f,g);
+    //auto fg = compose(world,hello);
+    //std::cout << fg(2) << std::endl;
+  }
+
+  {
+    auto g1 = [](int)  -> bool  { std::cout << "Hello"; return true;  };
+    auto g2 = [](bool) -> float { std::cout << " World" << std::endl; return 1.; };
+    auto g = compose(g2, g1);
+    std::cout << g(1) << std::endl;
+
+    auto f = compose([](int y) -> bool  { std::cout << y * y << std::endl; return y > 0; },
+                     [](float x) -> int { return (int)(x * 2);  });
+    std:: cout << f(2.f);
+
+    auto h = compose(f, g2);
+    std::cout << h(false);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+
+  {
+    auto g = [](float x, float y, float z) -> float { return x*x + y*y + z*z; };
+    auto f = [](float l2) -> float                  { return std::sqrt(l2); };
+
+    float v[] = {1.f, 2.f, -1.f};
+    auto fg = compose(f, g);
+
+    std::cout << "Length = " << fg(v[0], v[1], v[2]) << std::endl;
+
+    auto h    = [](float f_) -> int { return (int)std::ceil(f_); };
+    auto hf   = compose(h,f);
+    auto hfg  = compose(hf,g);
+    auto hfg2 = COMPOSE2(h,f,g);
+    auto hfg3 = compose(h,f) + g;
+    auto hfg4 = compose(h,f).compose(g);
+
+    std::cout << hf(9.f) << std::endl;
+    std::cout << hfg(v[0], v[1], v[2]) << std::endl;
+    std::cout << hfg2(v[0], v[1], v[2]) << std::endl;
+    std::cout << hfg3(v[0], v[1], v[2]) << std::endl;
+  }
+}
+
 int main(int argc, char** argv) {
 
-  using namespace cmp;
+  test();
 
-  auto f = [](bool) { std::cout << "Test: "; };
-  size_t arity = function_traits<decltype(f)>::arity;
-  std::cout << "arity = " << arity << std::endl;
-
-  auto g = compose([](bool) -> float { std::cout << " World" << std::endl; return 1.; }, 
-                   []()     -> bool  { std::cout << "Hello"; return true;  });
-  g();
-
-  /*
-  auto f = compose([](int y)          { std::cout << y * y << std::endl; },
-                   [](float x) -> int { return (int)(x * 2);  });
-  f(2.);
-
-  auto h = compose(f, g);
-  */
   return 0;
 }
