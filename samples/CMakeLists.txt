@@ -1,5 +1,5 @@
 file(GLOB COMPOSITION_HEADERS *.h)
 file(GLOB COMPOSITION_SOURCES *.cpp)
 
-set(EX_PROG "compose")
+set(EX_PROG "fcSample")
 add_executable(${EX_PROG} ${COMPOSITION_SOURCES} ${COMPOSITION_HEADERS})

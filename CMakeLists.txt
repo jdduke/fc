@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-project(CPP11)
+project(FC)
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
@@ -15,42 +15,42 @@ set(CMAKE_DEBUG_POSTFIX "d")
 SET(TREAT_WARNINGS_AS_ERRORS TRUE CACHE BOOL "Treat warnings as errors")
 
 if(MSVC10)
-  set(PU_SUFFIX _vc10)
+  set(FC_SUFFIX _vc10)
 elseif(MSVC11)
-  set(PU_SUFFIX _vc11)
+  set(FC_SUFFIX _vc11)
 else()
-  set(PU_SUFFIX)
+  set(FC_SUFFIX)
 endif()
 
 if(CMAKE_SIZEOF_VOID_P MATCHES 4)
-  set(CPP11_SIZE_TYPE x86)
+  set(FC_SIZE_TYPE x86)
 else()
-  set(CPP11_SIZE_TYPE x64)
+  set(FC_SIZE_TYPE x64)
 endif()
 
 set(BUILD_SHARED_LIBS TRUE CACHE BOOL "TRUE to build shared libraries, FALSE to build static libraries")
 if(BUILD_SHARED_LIBS)
-  set(CPP11_LIBRARY_TYPE SHARED)
-  set(CPP11_LIBRARY_PATH ${CMAKE_HOME_DIRECTORY}/lib/${CPP11_SIZE_TYPE}${CPP11_SUFFIX}_shared)
+  set(FC_LIBRARY_TYPE SHARED)
+  set(FC_LIBRARY_PATH ${CMAKE_HOME_DIRECTORY}/lib/${FC_SIZE_TYPE}${FC_SUFFIX}_shared)
 else()
-  add_definitions("-DCPP11_STATIC")
-  set(CPP11_LIBRARY_TYPE STATIC)
-  set(CPP11_LIBRARY_PATH  ${CMAKE_HOME_DIRECTORY}/lib/${CPP11_SIZE_TYPE}${CPP11_SUFFIX}_static)
+  add_definitions("-DFC_STATIC")
+  set(FC_LIBRARY_TYPE STATIC)
+  set(FC_LIBRARY_PATH  ${CMAKE_HOME_DIRECTORY}/lib/${FC_SIZE_TYPE}${FC_SUFFIX}_static)
   set(CMAKE_EXECUTABLE_SUFFIX s${CMAKE_EXECUTABLE_SUFFIX})
 endif()
 
-set(CPP11_BINARY_PATH ${CMAKE_HOME_DIRECTORY}/bin/${CPP11_SIZE_TYPE}${CPP11_SUFFIX})
+set(FC_BINARY_PATH ${CMAKE_HOME_DIRECTORY}/bin/${FC_SIZE_TYPE}${FC_SUFFIX})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
-    ${CPP11_BINARY_PATH}
+    ${FC_BINARY_PATH}
     CACHE PATH
     "Single Directory for all Executables.")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
-    ${CPP11_BINARY_PATH}
+    ${FC_BINARY_PATH}
     CACHE PATH
     "Single Directory for all Libraries")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-    ${CPP11_LIBRARY_PATH}
+    ${FC_LIBRARY_PATH}
     CACHE PATH
     "Single Directory for all static libraries.")
 
@@ -115,15 +115,12 @@ if(WIN32)
   endif()
 endif()
 
-set(TTHREAD_LIB tthread)
-
-include_directories(${CPP11_SOURCE_DIR}/composition)
-include_directories(common)
-include_directories(external)
-
-add_subdirectory(composition)
+include_directories(${FC_SOURCE_DIR}/include)
 
 SET(BUILD_SAMPLES TRUE CACHE BOOL "Build samples")
 if(BUILD_SAMPLES)
-
+  set(TTHREAD_LIB tthread)
+  include_directories(common)
+  include_directories(external)
+  add_subdirectory(samples)
 endif()
