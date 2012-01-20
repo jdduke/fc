@@ -97,11 +97,15 @@ int main(int argc, char** argv) {
   auto shortLines3    = make_function(unlines2) + filter + lines + inlines;
   auto shortLines4    = (unlines + filter).with(lines + inlines);
 
-  std::cout << unlines(filter(lines(inlines(testInput)))) << std::endl << std::endl;
-  std::cout << shortLines (testInput) << std::endl << std::endl;
-  std::cout << shortLines2(testInput) << std::endl << std::endl;
-  std::cout << shortLines3(testInput) << std::endl << std::endl;
-  std::cout << shortLines4(testInput) << std::endl << std::endl;
+  auto print = [](const std::string& s) {
+    std::cout << s << std::endl << std::endl;
+  };
+  
+  print( unlines(filter(lines(inlines(testInput)))));
+  print( shortLines (testInput) );
+  print( shortLines2(testInput) );
+  print( shortLines3(testInput) );
+  print( shortLines4(testInput) );
 
   std::cout << "Press any key to continue...";
   std::cin.ignore(0,'\n');
