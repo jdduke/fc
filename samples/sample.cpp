@@ -12,61 +12,20 @@
 
 #include <fc.h>
 
-namespace str {
-
-using std::string;
-using std::stringstream;
-typedef std::vector<string> strings;
-
-strings& split(const string& s, char delim, strings& elems) {
-  stringstream ss(s);
-  string item;
-  while(std::getline(ss, item, delim)) {
-    elems.push_back(item);
-  }
-  return elems;
-}
-
-strings split(const string &s, char delim) {
-  strings elems;
-  return split(s, delim, elems);
-}
-
-strings lines(const string& s) {
-  return split(s, '\n');
-}
-
-string unlines(const strings& elems) {
-  stringstream ss;
-  std::for_each(elems.begin(), elems.end(), [&ss](const string& s) {
-    ss << s << std::endl;
-  });
-  return ss.str();
-}
-
-}
-
 bool hello() { std::cout << "Hello "; return true; }
-void world(bool print) { if(print) std::cout << " World "; }
+void world(bool print) { if(print) std::cout << " World " << std::endl; }
 
 void test() {
 
   using namespace fc;
 
   {
-    std::function<bool(void)> g = hello;
-    std::function<void(bool)> f = world;
-    //auto fg = compose(f,g);
-    //auto fg = compose(world,hello);
-    //std::cout << fg(2) << std::endl;
-  }
+    auto hello_world = make_function(world) + make_function(hello);
+    hello_world();
 
-  {
-    auto g = [](bool) -> bool  { std::cout << "Hello"; return true;  };
-    auto f = [](bool)          { std::cout << " World" << std::endl; };
-    auto fg = compose(f, g);
-    fg(true);
-    (f+g)(false);
+    auto hello2 = []()     -> bool { return hello(); };
+    auto world2 = [](bool b)       { world(b);       };
+    compose(world2, hello2)();
   }
 
   ///////////////////////////////////////////////////////////////////////////
