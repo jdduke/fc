@@ -15,7 +15,7 @@ namespace fc {
 ///////////////////////////////////////////////////////////////////////////
 
 template<typename F, typename G>              class composed_base;
-template<typename F, typename G, size_t ArgC> class composed;
+template<typename F, typename G, size_t ArgFC, size_t ArgGC> class composed;
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -24,11 +24,27 @@ typename std::add_rvalue_reference<T>::type declval();
 
 ///////////////////////////////////////////////////////////////////////////
 
+template <typename T> struct function_traits;
+
+/*template <typename T, bool isFunction>
+struct function_traits_helper : public function_traits< decltype( &T::operator() ) > {};
+
+template <typename T>
+struct function_traits_helper<T, true> : public function_traits< decltype( &T() ) > {};*/
+
+#if 0
+template <typename T>
+struct function_traits : public function_traits_helper< T, typename std::is_pointer<T>::value > {};
+#else
 template <typename T>
 struct function_traits : public function_traits< decltype( &T::operator() ) > {};
+#endif
 
-template <typename F, typename G, size_t ArgC>
-struct function_traits< composed<F,G,ArgC> > : public function_traits<G> {};
+template <typename F, typename G, size_t ArgFC, size_t ArgGC>
+struct function_traits< composed<F,G,ArgFC,ArgGC> > : public function_traits<G> {};
+
+template <typename C, typename R>
+struct function_traits<R(C::*)() const> { enum { arity = 0 }; };
 
 template <typename C, typename R, typename T0>
 struct function_traits<R(C::*)(T0) const> { enum { arity = 1 }; };
@@ -38,6 +54,9 @@ struct function_traits<R(C::*)(T0,T1) const> { enum { arity = 2 }; };
 
 template <typename C, typename R, typename T0, typename T1, typename T2>
 struct function_traits<R(C::*)(T0,T1,T2) const> { enum { arity = 3 }; };
+
+template <typename R>
+struct function_traits<std::function<R()> > { enum { arity = 0 }; };
 
 template <typename R, typename T0>
 struct function_traits<std::function<R(T0)> > { enum { arity = 1 }; };
@@ -56,11 +75,22 @@ struct count_arg : std::enable_if<function_traits<Functor>::arity==NArgs, Return
 
 template<typename F, typename G>
 struct composed_traits {
-  typedef composed<F,G,function_traits<G>::arity> type;
+  typedef composed<F,G,function_traits<F>::arity,function_traits<G>::arity> type;
 };
 
 ///////////////////////////////////////////////////////////////////////////
-// 
+
+template <typename T>
+struct make_function_traits {
+  typedef std::function<typename std::enable_if<std::is_function<T>::value, T>::type> type;
+};
+
+template<typename T>
+auto make_function(T *t) -> typename make_function_traits<T>::type {
+  return t;
+}
+
+///////////////////////////////////////////////////////////////////////////
 
 template <typename F, typename G>
 inline auto compose(F f, G g) -> typename composed_traits<F,G>::type {
@@ -74,7 +104,7 @@ inline auto compose(F f, G1 g1, G2 g2) -> decltype( compose(compose(f,g1),g2) ) 
 
 template<typename F, typename G1, typename G2, typename G3>
 inline auto compose(F f, G1 g1, G2 g2, G3 g3) -> decltype( compose(compose(f,g1,g2),g3) ) {
-  return compose(compose(f,g1,g2),g4);
+  return compose(compose(f,g1,g2),g3);
 }
 
 template<typename F, typename G1, typename G2, typename G3, typename G4>
@@ -90,6 +120,11 @@ inline auto compose(F f, G1 g1, G2 g2, G3 g3, G4 g4, G5 g5) -> decltype( compose
 template<typename F, typename G>
 inline auto operator+(F f, G g) -> typename composed_traits<F,G>::type {
   return compose(f,g);
+}
+
+template<typename F, typename G>
+inline auto operator+(F f, G* g) -> typename composed_traits<F, typename make_function_traits<G>::type >::type {
+  return compose(f,make_function(g));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -120,7 +155,7 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////////
 
-template<typename F, typename G, size_t ArgC>
+template<typename F, typename G, size_t argFC, size_t ArgGC>
 class composed : public composed_base<F,G> {
   template<typename F, typename G>
   struct result
@@ -138,8 +173,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////
 
-template<typename F, typename G>
-class composed<F,G,1> : public composed_base<F,G> {
+template<typename F, typename G, size_t ArgFC>
+class composed<F,G,ArgFC,1> : public composed_base<F,G> {
   template<typename F, typename G, typename T1>
   struct result
   {
@@ -159,8 +194,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////
 
-template<typename F, typename G>
-class composed<F,G,2> : public composed_base<F,G> {
+template<typename F, typename G, size_t ArgFC>
+class composed<F,G,ArgFC, 2> : public composed_base<F,G> {
   template<typename F, typename G, typename T1, typename T2>
   struct result
   {
@@ -180,8 +215,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////
 
-template<typename F, typename G>
-class composed<F,G,3> : public composed_base<F,G> {
+template<typename F, typename G, size_t ArgFC>
+class composed<F,G,ArgFC,3> : public composed_base<F,G> {
   template<typename F, typename G, typename T1, typename T2, typename T3>
   struct result
   {

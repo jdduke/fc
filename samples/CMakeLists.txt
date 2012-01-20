@@ -1,5 +1,3 @@
-file(GLOB COMPOSITION_HEADERS *.h)
-file(GLOB COMPOSITION_SOURCES *.cpp)
-
-set(EX_PROG "fcSample")
-add_executable(${EX_PROG} ${COMPOSITION_SOURCES} ${COMPOSITION_HEADERS})
+add_executable(fcSample sample.cpp)
+add_executable(fcSampleString sample_string.cpp)
+add_executable(fcSampleThreaded sample_threaded.cpp)
