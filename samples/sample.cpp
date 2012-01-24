@@ -51,10 +51,11 @@ void test() {
     auto h    = [](float f_) -> int { return (int)std::ceil(f_); };
     auto hf   = compose(h,f);
     auto hfg  = compose(hf,g);
-    auto hfg1 = compose( [](float f)                   -> int   { return (int)std::ceil(f); },
-                         [](float l)                   -> float { return std::sqrt(l);      },
+    auto hfg1 = compose( compose(
+                         [](float f)                   -> int   { return (int)std::ceil(f); },
+                         [](float l)                   -> float { return std::sqrt(l);      } ),
                          [](float x, float y, float z) -> float { return x*x + y*y + z*z;   } );
-    auto hfg2 = compose(h,f,g);
+    auto hfg2 = compose(h,compose(f,g));
     auto hfg3 = compose(h,f) + g;
     auto hfg4 = hf+g;
     auto hfg5 = h+f+g;

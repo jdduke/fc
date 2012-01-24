@@ -11,9 +11,13 @@
 #include <type_traits>
 
 #include "fc_utils.h"
-#include "fc_apply_utils.h"
+
+#if defined(FC_EXPERIMENTAL)
+#include "fc_experimental.h"
+#endif
 
 namespace fc {
+
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -22,34 +26,9 @@ inline auto compose(F f, G g) -> typename composed_traits<F,G>::type {
   return typename composed_traits<F,G>::type(f, g);
 }
 
-template<typename F, typename G1, typename G2>
-inline auto compose(F f, G1 g1, G2 g2) -> decltype( compose(compose(f,g1),g2) ) {
-  return compose(compose(f, g1), g2);
-}
-
-template<typename F, typename G1, typename G2, typename G3>
-inline auto compose(F f, G1 g1, G2 g2, G3 g3) -> decltype( compose(compose(f,g1,g2),g3) ) {
-  return compose(compose(f,g1,g2),g3);
-}
-
-template<typename F, typename G1, typename G2, typename G3, typename G4>
-inline auto compose(F f, G1 g1, G2 g2, G3 g3, G4 g4) -> decltype( compose(compose(f,g1,g2,g3),g4) ) {
-  return compose(compose(f,g1,g2,g3),g4);
-}
-
-template<typename F, typename G1, typename G2, typename G3, typename G4, typename G5>
-inline auto compose(F f, G1 g1, G2 g2, G3 g3, G4 g4, G5 g5) -> decltype( compose(compose(f,g1,g2,g3,g4),g5) ) {
-  return compose(compose(f,g1,g2,g3,g4),g5);
-}
-
 template<typename F, typename G>
 inline auto operator+(F f, G g) -> typename composed_traits<F,G>::type {
   return compose(f,g);
-}
-
-template<typename F, typename G>
-inline auto operator+(F f, G* g) -> typename composed_traits<F, typename make_function_traits<G>::type >::type {
-  return compose(f,make_function(g));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -94,26 +73,6 @@ protected:
 
   F f;
   G g;
-};
-
-///////////////////////////////////////////////////////////////////////////
-
-template<typename F, typename G0, typename G1>
-class composed_base2 : public composed_base<F,G0> {
-public:
-  enum {
-    arity_0 = function_traits<G0>::arity,
-    arity_1 = function_traits<G1>::arity,
-    arity_c = arity_0 + arity_1
-  };
-
-protected:
-
-  explicit composed_base2(F f_,   G0   g_, G1   g1_) : composed_base(f_,g_), g1(g1) { }
-  explicit composed_base2(F&& f_, G0&& g_, G1&& g1_) : composed_base(f_,g_), g1(std:::move(g1_)) { }
-  composed_base2();
-
-  G1 g1;
 };
 
 ///////////////////////////////////////////////////////////////////////////

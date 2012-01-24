@@ -12,7 +12,12 @@ set(CMAKE_DEBUG_POSTFIX "d")
 #add_definitions( "-DHAS_BOOST" )
 
 # Treat warnings as errors cmake option
-SET(TREAT_WARNINGS_AS_ERRORS TRUE CACHE BOOL "Treat warnings as errors")
+set(TREAT_WARNINGS_AS_ERRORS TRUE CACHE BOOL "Treat warnings as errors")
+set(ENABLE_EXPERIMENTAL_FC TRUE CACHE BOOL "Enable experimental function composition routines.")
+
+if(ENABLE_EXPERIMENTAL_FC)
+  add_definitions( "-DFC_EXPERIMENTAL" )
+endif()
 
 if(MSVC10)
   set(FC_SUFFIX _vc10)

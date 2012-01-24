@@ -25,23 +25,21 @@ typename std::add_rvalue_reference<T>::type declval();
 ///////////////////////////////////////////////////////////////////////////
 
 template <typename T> struct function_traits;
+template <typename T0, typename T1> struct function_traits2;
 
-/*template <typename T, bool isFunction>
-struct function_traits_helper : public function_traits< decltype( &T::operator() ) > {};
-
-template <typename T>
-struct function_traits_helper<T, true> : public function_traits< decltype( &T() ) > {};*/
-
-#if 0
-template <typename T>
-struct function_traits : public function_traits_helper< T, typename std::is_pointer<T>::value > {};
-#else
 template <typename T>
 struct function_traits : public function_traits< decltype( &T::operator() ) > {};
-#endif
+
+template <typename T0, typename T1>
+struct function_traits2 {
+  enum { arity = function_traits< decltype( &T0::operator() ) >::arity 
+               + function_traits< decltype( &T1::operator() ) >::arity };
+};
 
 template <typename F, typename G, size_t ArgFC, size_t ArgGC>
 struct function_traits< composed<F,G,ArgFC,ArgGC> > : public function_traits<G> {};
+
+///////////////////////////////////////////////////////////////////////////
 
 template <typename C, typename R>
 struct function_traits<R(C::*)() const> { 
@@ -82,13 +80,17 @@ template<typename F, typename T0>
 struct result1 { typedef decltype( declval<F>().operator()(declval<T0>()) ) type; };
 
 template<typename F, typename T0, typename T1>
-struct result2 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>()) ) type; };
+//struct result2 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>()) ) type; };
+struct result2 { typedef decltype( declval<F>().operator()(declval<T0>(),declval<T1>()) ) type; };
 
 template<typename F, typename T0, typename T1, typename T2>
 struct result3 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>(), declval<T2>()) ) type; };
 
 template<typename F, typename T0, typename T1, typename T2, typename T3>
 struct result4 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>(), declval<T2>(), declval<T3>()) ) type; };
+
+template<typename F, typename T0, typename T1, typename T2, typename T3, typename T4>
+struct result5 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>(), declval<T2>(), declval<T3>(), , declval<T4>()) ) type; };
 
 ///////////////////////////////////////////////////////////////////////////
 
