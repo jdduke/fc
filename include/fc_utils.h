@@ -87,6 +87,9 @@ struct result2 { typedef decltype( declval<F>().operator()(declval<T0>(), declva
 template<typename F, typename T0, typename T1, typename T2>
 struct result3 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>(), declval<T2>()) ) type; };
 
+template<typename F, typename T0, typename T1, typename T2, typename T3>
+struct result4 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>(), declval<T2>(), declval<T3>()) ) type; };
+
 ///////////////////////////////////////////////////////////////////////////
 
 template<typename F, typename G>
@@ -115,9 +118,8 @@ struct compound_result3 {
 
 ///////////////////////////////////////////////////////////////////////////
 
-/*template<typename Functor, size_t NArgs, typename Return>
-struct count_arg : std::enable_if<function_traits<Functor>::arity==NArgs, Return>
-{};*/
+template<typename Functor, size_t NArgs, typename Return>
+struct enable_if_arg : std::enable_if<function_traits<Functor>::arity==NArgs, Return> { };
 
 ///////////////////////////////////////////////////////////////////////////
 

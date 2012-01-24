@@ -11,6 +11,7 @@
 #include <type_traits>
 
 #include "fc_utils.h"
+#include "fc_apply_utils.h"
 
 namespace fc {
 
@@ -56,18 +57,10 @@ inline auto operator+(F f, G* g) -> typename composed_traits<F, typename make_fu
 template<typename F, typename G>
 class composed_base {
 public:
-
   template< typename G2 >
   auto with(G2 g2) const -> typename composed_traits< typename composed_traits<F,G>::type, G2>::type {
     return compose(compose(f,g), g2);
   }
-
-/*
-  template< typename G2 >
-  auto operator+(G2 g2) -> decltype( this->compose(g2) ) {
-    return with(g2);
-  }
-*/
 
 protected:
 
@@ -77,6 +70,22 @@ protected:
 
   F f;
   G g;
+};
+
+template<typename F, typename G0, typename G1>
+class composed_base2 : public composed_base<F,G0> {
+public:
+  enum {
+    arity_0 = function_traits<G0>::arity;
+  };
+
+protected:
+
+  explicit composed_base2(F f_,   G0   g_, G1   g1_) : composed_base(f_,g_), g1(g1) { }
+  explicit composed_base2(F&& f_, G0&& g_, G1&& g1_) : composed_base(f_,g_), g1(std:::move(g1_)) { }
+  composed_base2();
+
+  G1 g1;
 };
 
 ///////////////////////////////////////////////////////////////////////////
