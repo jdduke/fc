@@ -66,25 +66,24 @@ public:
     return compose(compose(f,g), g2);
   }
 
-  /*
-  auto operator()() -> typename std::enable_if<arity==0, typename compound_result0<F,G>::type>::type {
-    return f(g()); 
-  }
-  */
-
-  template<typename T1>
-  auto operator()(const T1& t) -> typename compound_result1<F,G,T1>::type {
+  template<typename T0>
+  auto operator()(const T0& t) -> typename compound_result1<F,G,T0>::type {
     return f(g(t));
   }
 
-  template<typename T1, typename T2>
-  auto operator()(const T1& t1, const T2& t2) -> typename compound_result2<F,G,T1,T2>::type {
-    return f(g(t1,t2));
+  template<typename T0, typename T1>
+  auto operator()(const T0& t0, const T1& t1) -> typename compound_result2<F,G,T0,T1>::type {
+    return f(g(t0,t1));
   }
 
-  template<typename T1, typename T2, typename T3>
-  auto operator()(const T1& t1, const T2& t2, const T3& t3) -> typename compound_result3<F,G,T1,T2,T3>::type {
-    return f(g(t1,t2,t3));
+  template<typename T0, typename T1, typename T2>
+  auto operator()(const T0& t0, const T1& t1, const T2& t2) -> typename compound_result3<F,G,T0,T1,T2>::type {
+    return f(g(t0,t1,t2));
+  }
+
+  template<typename T0, typename T1, typename T2, typename T3>
+  auto operator()(const T0& t0, const T1& t1, const T2& t2, const T3& t3) -> typename compound_result4<F,G,T0,T1,T2,T3>::type {
+    return f(g(t0,t1,t2,t3));
   }
 
 protected:

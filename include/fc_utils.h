@@ -116,6 +116,12 @@ struct compound_result3 {
   typedef typename result1<F,U>::type type;
 };
 
+template<typename F, typename G, typename T0, typename T1, typename T2, typename T3>
+struct compound_result4 {	
+  typedef typename result4<G,T0,T1,T2,T3>::type U;
+  typedef typename result1<F,U>::type type;
+};
+
 ///////////////////////////////////////////////////////////////////////////
 
 template<typename Functor, size_t NArgs, typename Return>
