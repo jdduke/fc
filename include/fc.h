@@ -10,85 +10,9 @@
 #include <functional>
 #include <type_traits>
 
+#include "fc_utils.h"
+
 namespace fc {
-
-///////////////////////////////////////////////////////////////////////////
-
-template<typename F, typename G>              class composed_base;
-template<typename F, typename G, size_t ArgFC, size_t ArgGC> class composed;
-
-///////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-typename std::add_rvalue_reference<T>::type declval();
-
-///////////////////////////////////////////////////////////////////////////
-
-template <typename T> struct function_traits;
-
-/*template <typename T, bool isFunction>
-struct function_traits_helper : public function_traits< decltype( &T::operator() ) > {};
-
-template <typename T>
-struct function_traits_helper<T, true> : public function_traits< decltype( &T() ) > {};*/
-
-#if 0
-template <typename T>
-struct function_traits : public function_traits_helper< T, typename std::is_pointer<T>::value > {};
-#else
-template <typename T>
-struct function_traits : public function_traits< decltype( &T::operator() ) > {};
-#endif
-
-template <typename F, typename G, size_t ArgFC, size_t ArgGC>
-struct function_traits< composed<F,G,ArgFC,ArgGC> > : public function_traits<G> {};
-
-template <typename C, typename R>
-struct function_traits<R(C::*)() const> { enum { arity = 0 }; };
-
-template <typename C, typename R, typename T0>
-struct function_traits<R(C::*)(T0) const> { enum { arity = 1 }; };
-
-template <typename C, typename R, typename T0, typename T1>
-struct function_traits<R(C::*)(T0,T1) const> { enum { arity = 2 }; };
-
-template <typename C, typename R, typename T0, typename T1, typename T2>
-struct function_traits<R(C::*)(T0,T1,T2) const> { enum { arity = 3 }; };
-
-template <typename R>
-struct function_traits<std::function<R()> > { enum { arity = 0 }; };
-
-template <typename R, typename T0>
-struct function_traits<std::function<R(T0)> > { enum { arity = 1 }; };
-
-template <typename R, typename T0, typename T1>
-struct function_traits<std::function<R(T0,T1)> > { enum { arity = 2 }; };
-
-template <typename R, typename T0, typename T1, typename T2>
-struct function_traits<std::function<R(T0,T1,T2)> > { enum { arity = 3 }; };
-
-template<typename Functor, size_t NArgs, typename Return>
-struct count_arg : std::enable_if<function_traits<Functor>::arity==NArgs, Return>
-{};
-
-///////////////////////////////////////////////////////////////////////////
-
-template<typename F, typename G>
-struct composed_traits {
-  typedef composed<F,G,function_traits<F>::arity,function_traits<G>::arity> type;
-};
-
-///////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-struct make_function_traits {
-  typedef std::function<typename std::enable_if<std::is_function<T>::value, T>::type> type;
-};
-
-template<typename T>
-auto make_function(T *t) -> typename make_function_traits<T>::type {
-  return t;
-}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -138,10 +62,12 @@ public:
     return compose(compose(f,g), g2);
   }
 
+/*
   template< typename G2 >
   auto operator+(G2 g2) -> decltype( this->compose(g2) ) {
     return with(g2);
   }
+*/
 
 protected:
 
@@ -157,37 +83,23 @@ protected:
 
 template<typename F, typename G, size_t argFC, size_t ArgGC>
 class composed : public composed_base<F,G> {
-  template<typename F, typename G>
-  struct result
-  {
-    typedef decltype( declval<G>().operator()() ) U;
-    typedef decltype( declval<F>().operator()(declval<U>()) ) type;
-  };
-
 public:
   composed(F f_,   G g_)   : composed_base<F,G>(f_,g_) { }
   composed(F&& f_, G&& g_) : composed_base<F,G>(std::forward(f_),std::forward(g_)) { }
 
-  auto operator()() -> typename result<F,G>::type { return f(g()); }
+  auto operator()() -> typename compound_result0<F,G>::type { return f(g()); }
 };
 
 ///////////////////////////////////////////////////////////////////////////
 
 template<typename F, typename G, size_t ArgFC>
 class composed<F,G,ArgFC,1> : public composed_base<F,G> {
-  template<typename F, typename G, typename T1>
-  struct result
-  {
-    typedef decltype( declval<G>().operator()(declval<T1>()) ) U;
-    typedef decltype( declval<F>().operator()(declval<U>()) ) type;
-  };
-
 public:
   explicit composed(F f_,   G g_)   : composed_base<F,G>(f_,g_) { }
   explicit composed(F&& f_, G&& g_) : composed_base<F,G>(std::forward(f_),std::forward(g_)) { }
 
   template<typename T1>
-  auto operator()(const T1& t) -> typename result<F,G,T1>::type {
+  auto operator()(const T1& t) -> typename compound_result1<F,G,T1>::type {
     return f(g(t));
   }
 };
@@ -196,19 +108,12 @@ public:
 
 template<typename F, typename G, size_t ArgFC>
 class composed<F,G,ArgFC, 2> : public composed_base<F,G> {
-  template<typename F, typename G, typename T1, typename T2>
-  struct result
-  {
-    typedef decltype( declval<G>().operator()(declval<T1>(), declval<T2>()) ) U;
-    typedef decltype( declval<F>().operator()(declval<U>()) ) type;
-  };
-
 public:
   explicit composed(F f_,   G g_)   : composed_base<F,G>(f_,g_) { }
   explicit composed(F&& f_, G&& g_) : composed_base<F,G>(std::forward(f_),std::forward(g_)) { }
 
   template<typename T1, typename T2>
-  auto operator()(const T1& t1, const T2& t2) -> typename result<F,G,T1,T2>::type {
+  auto operator()(const T1& t1, const T2& t2) -> typename compound_result2<F,G,T1,T2>::type {
     return f(g(t1,t2));
   }
 };
@@ -217,19 +122,12 @@ public:
 
 template<typename F, typename G, size_t ArgFC>
 class composed<F,G,ArgFC,3> : public composed_base<F,G> {
-  template<typename F, typename G, typename T1, typename T2, typename T3>
-  struct result
-  {
-    typedef decltype( declval<G>().operator()(declval<T1>(), declval<T2>(), declval<T3>()) ) U;
-    typedef decltype( declval<F>().operator()(declval<U>()) ) type;
-  };
-
 public:
   explicit composed(F f_,   G g_)   : composed_base<F,G>(f_,g_) { }
   explicit composed(F&& f_, G&& g_) : composed_base<F,G>(std::forward(f_),std::forward(g_)) { }
 
   template<typename T1, typename T2, typename T3>
-  auto operator()(const T1& t1, const T2& t2, const T3& t3) -> typename result<F,G,T1,T2,T3>::type {
+  auto operator()(const T1& t1, const T2& t2, const T3& t3) -> typename compound_result3<F,G,T1,T2,T3>::type {
     return f(g(t1,t2,t3));
   }
 };
