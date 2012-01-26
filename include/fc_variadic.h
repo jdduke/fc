@@ -4,21 +4,17 @@
 // www.opensource.org/licenses/mit-license.php
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _FC_H_
-#define _FC_H_
+#ifndef _FC_VARIADIC_H_
+#define _FC_VARIADIC_H_
 
 #include <functional>
 #include <type_traits>
-
-#if defined(FC_VARIADIC)
-#include "fc_variadic.h"
-#else
 
 #if defined(FC_EXPERIMENTAL)
 #include "fc_experimental.h"
 #endif
 
-#include "fc_utils.h"
+#include "fc_variadic_utils.h"
 
 namespace fc {
 
@@ -48,24 +44,9 @@ public:
     return compose(compose(f,g), g2);
   }
 
-  template<typename T0>
-  auto operator()(const T0& t) -> typename compound_result1<F,G,T0>::type {
-    return f(g(t));
-  }
-
-  template<typename T0, typename T1>
-  auto operator()(const T0& t0, const T1& t1) -> typename compound_result2<F,G,T0,T1>::type {
-    return f(g(t0,t1));
-  }
-
-  template<typename T0, typename T1, typename T2>
-  auto operator()(const T0& t0, const T1& t1, const T2& t2) -> typename compound_result3<F,G,T0,T1,T2>::type {
-    return f(g(t0,t1,t2));
-  }
-
-  template<typename T0, typename T1, typename T2, typename T3>
-  auto operator()(const T0& t0, const T1& t1, const T2& t2, const T3& t3) -> typename compound_result4<F,G,T0,T1,T2,T3>::type {
-    return f(g(t0,t1,t2,t3));
+  template<typename... Args>
+  auto operator()(Args... args) -> typename compound_result<F,G,Args...>::type {
+    return f(g(args...));
   }
 
 protected:
@@ -93,11 +74,9 @@ public:
   composed(F f_,   G g_)   : composed_base<F,G>(f_,g_) { }
   composed(F&& f_, G&& g_) : composed_base<F,G>(std::forward(f_),std::forward(g_)) { }
 
-  auto operator()() -> typename compound_result0<F,G>::type { return f(g()); }
+  auto operator()() -> typename compound_result<F,G>::type { return f(g()); }
 };
 
 }
-
-#endif /* FC_VARIADIC */
 
 #endif /* FC_H */

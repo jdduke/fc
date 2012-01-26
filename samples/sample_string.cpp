@@ -10,7 +10,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <conio.h>
 
 #include <fc.h>
 
@@ -36,7 +35,7 @@ strings split(const string &s, char delim) {
   return split_helper(s, delim, elems);
 };
 
-auto filter = [=](const strings& elems) -> strings {
+auto filter = [=](strings elems) -> strings {
   strings filteredElems;
   std::copy_if(begin(elems), end(elems), back_inserter(filteredElems), [=](const std::string& s) {
     return s.size() < FilteredStringLength;
@@ -44,15 +43,15 @@ auto filter = [=](const strings& elems) -> strings {
   return filteredElems;
 };
 
-auto lines = [](const string& s) -> strings {
+auto lines = [](string s) -> strings {
   return split(s, ' ');
 };
 
-strings lines2 (const string& s) {
+strings lines2 (string s) {
   return split(s, ' ');
 }
 
-auto unlines = [](const strings& elems) -> string {
+auto unlines = [](strings elems) -> string {
   stringstream ss;
   std::for_each(elems.begin(), elems.end(), [&ss](const string& s) {
     ss << s << std::endl;
@@ -60,7 +59,7 @@ auto unlines = [](const strings& elems) -> string {
   return ss.str();
 };
 
-string unlines2( const strings& elems) {
+string unlines2(strings elems) {
   stringstream ss;
   std::for_each(elems.begin(), elems.end(), [&ss](const string& s) {
     ss << s << std::endl;
@@ -68,7 +67,7 @@ string unlines2( const strings& elems) {
   return ss.str();
 }
 
-string inlines2(const std::string& input) {
+string inlines2(string input) {
   if (!input.empty())
     return input;
   else
@@ -80,7 +79,7 @@ string inlines2(const std::string& input) {
   }
 };
 
-auto inlines = [](const std::string& input) -> std::string {
+auto inlines = [](string input) -> std::string {
   return inlines2(input);
 };
 
@@ -97,19 +96,15 @@ int main(int argc, char** argv) {
   auto shortLines3    = make_function(unlines2) + filter + lines + inlines;
   auto shortLines4    = (unlines + filter).with(lines + inlines);
 
-  auto print = [](const std::string& s) {
+  auto print = [](std::string s) {
     std::cout << s << std::endl << std::endl;
   };
-  
+
   print( unlines(filter(lines(inlines(testInput)))));
   print( shortLines (testInput) );
   print( shortLines2(testInput) );
   print( shortLines3(testInput) );
   print( shortLines4(testInput) );
-
-  std::cout << "Press any key to continue...";
-  std::cin.ignore(0,'\n');
-  _getch();
 
   return 0;
 }

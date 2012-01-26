@@ -7,6 +7,10 @@
 #ifndef _FC_EXPERIMENTAL_H_
 #define _FC_EXPERIMENTAL_H_
 
+#if defined(FC_VARIADIC)
+#include "fc_experimental_variadic.h"
+#else
+
 #include "fc_experimental_utils.h"
 
 namespace fc {
@@ -33,10 +37,10 @@ public:
 
   template<typename R, typename Args>
   R apply(const Args& args) {
-    return f(apply_func<G0,Args,0,      arity_0        >(g,args), 
+    return f(apply_func<G0,Args,0,      arity_0        >(g,args),
              apply_func<G1,Args,arity_0,arity_0+arity_1>(g1,args));
   }
-  
+
   template<typename T0>
   auto operator()(const T0& t) -> typename compound_result21<F,G0,G1,T0>::type {
     return apply<typename compound_result21<F,G0,G1,T0>::type>(std::forward_as_tuple(t));
@@ -108,5 +112,6 @@ public:
 
 }
 
+#endif /* FC_VARIADIC */
 
 #endif

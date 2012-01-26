@@ -19,8 +19,12 @@ template<typename F, typename G, size_t ArgFC, size_t ArgGC> class composed;
 
 ///////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-typename std::add_rvalue_reference<T>::type declval();
+#if defined(_WIN32)
+namespace std {
+  template <typename T>
+  typename std::add_rvalue_reference<T>::type declval();
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -32,7 +36,7 @@ struct function_traits : public function_traits< decltype( &T::operator() ) > {}
 
 template <typename T0, typename T1>
 struct function_traits2 {
-  enum { arity = function_traits< decltype( &T0::operator() ) >::arity 
+  enum { arity = function_traits< decltype( &T0::operator() ) >::arity
                + function_traits< decltype( &T1::operator() ) >::arity };
 };
 
@@ -42,55 +46,55 @@ struct function_traits< composed<F,G,ArgFC,ArgGC> > : public function_traits<G> 
 ///////////////////////////////////////////////////////////////////////////
 
 template <typename C, typename R>
-struct function_traits<R(C::*)() const> { 
+struct function_traits<R(C::*)() const> {
 	enum { arity = 0 };
-	typedef decltype( declval<C>().operator()() ) result_type;
+	typedef decltype( std::declval<C>().operator()() ) result_type;
 };
 
 template <typename C, typename R, typename T0>
 struct function_traits<R(C::*)(T0) const> {
-	enum { arity = 1 }; 
+	enum { arity = 1 };
 	typedef R result_type;
 };
 
 template <typename C, typename R, typename T0, typename T1>
-struct function_traits<R(C::*)(T0,T1) const> { 
-	enum { arity = 2 }; 
+struct function_traits<R(C::*)(T0,T1) const> {
+	enum { arity = 2 };
 	typedef R result_type;
 };
 
 template <typename C, typename R, typename T0, typename T1, typename T2>
 struct function_traits<R(C::*)(T0,T1,T2) const> {
-	enum { arity = 3 }; 
+	enum { arity = 3 };
 	typedef R result_type;
 };
 
 template <typename C, typename R, typename T0, typename T1, typename T2, typename T3>
 struct function_traits<R(C::*)(T0,T1,T2,T3) const> {
-	enum { arity = 4 }; 
+	enum { arity = 4 };
 	typedef R result_type;
 };
 
 ///////////////////////////////////////////////////////////////////////////
 
 template<typename F>
-struct result0 { typedef decltype( declval<F>().operator()() ) type; };
+struct result0 { typedef decltype( std::declval<F>().operator()() ) type; };
 
 template<typename F, typename T0>
-struct result1 { typedef decltype( declval<F>().operator()(declval<T0>()) ) type; };
+struct result1 { typedef decltype( std::declval<F>().operator()(std::declval<T0>()) ) type; };
 
 template<typename F, typename T0, typename T1>
-//struct result2 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>()) ) type; };
-struct result2 { typedef decltype( declval<F>().operator()(declval<T0>(),declval<T1>()) ) type; };
+//struct result2 { typedef decltype( std::declval<F>().operator()(std::declval<T0>(), std::declval<T1>()) ) type; };
+struct result2 { typedef decltype( std::declval<F>().operator()(std::declval<T0>(),std::declval<T1>()) ) type; };
 
 template<typename F, typename T0, typename T1, typename T2>
-struct result3 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>(), declval<T2>()) ) type; };
+struct result3 { typedef decltype( std::declval<F>().operator()(std::declval<T0>(), std::declval<T1>(), std::declval<T2>()) ) type; };
 
 template<typename F, typename T0, typename T1, typename T2, typename T3>
-struct result4 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>(), declval<T2>(), declval<T3>()) ) type; };
+struct result4 { typedef decltype( std::declval<F>().operator()(std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()) ) type; };
 
 template<typename F, typename T0, typename T1, typename T2, typename T3, typename T4>
-struct result5 { typedef decltype( declval<F>().operator()(declval<T0>(), declval<T1>(), declval<T2>(), declval<T3>(), , declval<T4>()) ) type; };
+struct result5 { typedef decltype( std::declval<F>().operator()(std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()) ) type; };
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -107,19 +111,19 @@ struct compound_result1 {
 };
 
 template<typename F, typename G, typename T0, typename T1>
-struct compound_result2 {	
+struct compound_result2 {
   typedef typename result2<G,T0,T1>::type U;
   typedef typename result1<F,U>::type type;
 };
 
 template<typename F, typename G, typename T0, typename T1, typename T2>
-struct compound_result3 {	
+struct compound_result3 {
   typedef typename result3<G,T0,T1,T2>::type U;
   typedef typename result1<F,U>::type type;
 };
 
 template<typename F, typename G, typename T0, typename T1, typename T2, typename T3>
-struct compound_result4 {	
+struct compound_result4 {
   typedef typename result4<G,T0,T1,T2,T3>::type U;
   typedef typename result1<F,U>::type type;
 };
