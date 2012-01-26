@@ -115,13 +115,9 @@ struct composed_traits2 {
 
 template<typename F, typename G0, typename G1, typename tuple_type>
 struct compound_result2_helper {
-  static const size_t arity0 = function_traits<G0>::arity;
-  static const size_t arity1 = function_traits<G1>::arity;
-  typedef typename apply_helper<arity0>::tuple_traits<G0,tuple_type,0>::type      U;
-  typedef typename apply_helper<arity1>::tuple_traits<G1,tuple_type,arity0>::type V;
+  typedef typename function_traits<G0>::result_type U;
+  typedef typename function_traits<G1>::result_type V;
   typedef typename result2<F,U,V>::type type;
-  //typedef std::tuple<U,V> uv_tuple_type;
-  //typedef typename apply_helper<2>::tuple_traits<F,uv_tuple_type,0>::type type;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -161,14 +157,9 @@ struct compound_result24 {
 
 template<typename F, typename G0, typename G1, typename G2, typename tuple_type>
 struct compound_result3_helper {
-  enum {
-    arity0 = function_traits<G0>::arity,
-    arity1 = function_traits<G1>::arity,
-    arity2 = function_traits<G2>::arity
-  };
-  typedef typename apply_helper<arity0>::tuple_traits<G0,tuple_type,0>::type             U;
-  typedef typename apply_helper<arity1>::tuple_traits<G1,tuple_type,arity0>::type        V;
-  typedef typename apply_helper<arity2>::tuple_traits<G1,tuple_type,arity0+arity1>::type W;
+  typedef typename function_traits<G0>::result_type U;
+  typedef typename function_traits<G1>::result_type V;
+  typedef typename function_traits<G0>::result_type W;
   typedef typename result3<F,U,V,W>::type type;
 };
 
