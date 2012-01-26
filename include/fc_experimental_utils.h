@@ -29,7 +29,7 @@ struct apply_helper {
   };
 
   template< typename F, typename Args, size_t arg_0 >
-  static auto apply( F& f, Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
+  static auto apply( F& f, const Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
     return f();
   }
 };
@@ -37,12 +37,11 @@ struct apply_helper {
 template<>
 struct apply_helper<1> {
   template<typename F, typename tuple_type, size_t arg_0> struct tuple_traits {
-    typedef typename result1<F,
-      typename std::tuple_element<arg_0, tuple_type>::type > type;
+    typedef typename function_traits<F>::result_type type;
   };
 
   template< typename F, typename Args, size_t arg_0 >
-  static auto apply( F& f, Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
+  static auto apply( F& f, const Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
     return f( std::get<arg_0>(args) );
   }
 };
@@ -51,28 +50,22 @@ template<>
 struct apply_helper<2> {
   template<typename F, typename tuple_type, size_t arg_0> struct tuple_traits {
     typedef typename function_traits<F>::result_type type;
-    /*typedef typename result2<F,
-      typename std::tuple_element<arg_0,   tuple_type>::type,
-      typename std::tuple_element<arg_0+1, tuple_type>::type> type;*/
   };
 
   template< typename F, typename Args, size_t arg_0 >
-  static auto apply( F& f, Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
-    return f( std::get<arg_0>(args), std::get<arg_0+1>::(args) );
+  static auto apply( F& f, const Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
+    return f( std::get<arg_0>(args), std::get<arg_0+1>(args) );
   }
 };
 
 template<>
 struct apply_helper<3> {
   template<typename F, typename tuple_type, size_t arg_0> struct tuple_traits {
-    typedef typename result3<F,
-      typename std::tuple_element<arg_0,   tuple_type>::type,
-      typename std::tuple_element<arg_0+1, tuple_type>::type,
-      typename std::tuple_element<arg_0+2, tuple_type>::type> type;
+    typedef typename function_traits<F>::result_type type;
   };
 
   template< typename F, typename Args, size_t arg_0 >
-  static auto apply( F& f, Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
+  static auto apply( F& f, const Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
     return f( std::get<arg_0>(args), std::get<arg_0+1>(args), std::get<arg_0+2>(args) );
   }
 };
@@ -80,15 +73,11 @@ struct apply_helper<3> {
 template<>
 struct apply_helper<4> {
   template<typename F, typename tuple_type, size_t arg_0> struct tuple_traits {
-    typedef typename result4<F,
-      typename std::tuple_element<arg_0,   tuple_type>::type,
-      typename std::tuple_element<arg_0+1, tuple_type>::type,
-      typename std::tuple_element<arg_0+2, tuple_type>::type,
-      typename std::tuple_element<arg_0+3, tuple_type>::type> type;
+    typedef typename function_traits<F>::result_type type;
   };
 
   template< typename F, typename Args, size_t arg_0 >
-  static auto apply( F& f, Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
+  static auto apply( F& f, const Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
     return f( std::get<arg_0>(args), std::get<arg_0+1>(args), std::get<arg_0+2>(args), std::get<arg_0+3>(args) );
   }
 };
@@ -96,16 +85,11 @@ struct apply_helper<4> {
 template<>
 struct apply_helper<5> {
   template<typename F, typename tuple_type, size_t arg_0> struct tuple_traits {
-    typedef typename result5<F,
-      typename std::tuple_element<arg_0,   tuple_type>::type,
-      typename std::tuple_element<arg_0+1, tuple_type>::type,
-      typename std::tuple_element<arg_0+2, tuple_type>::type,
-      typename std::tuple_element<arg_0+3, tuple_type>::type,
-      typename std::tuple_element<arg_0+4, tuple_type>::type> type;
+    typedef typename function_traits<F>::result_type type;
   };
 
   template< typename F, typename Args, size_t arg_0 >
-  static auto apply( F& f, Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
+  static auto apply( F& f, const Args& args ) -> typename tuple_traits<F,Args,arg_0>::type {
     return f( std::get<arg_0>(args), std::get<arg_0+1>(args), std::get<arg_0+2>(args), std::get<arg_0+3>(args), std::get<arg_0+4>(args) );
   }
 };
@@ -115,6 +99,10 @@ auto apply_func( F& f, const Args& args) -> typename apply_helper<arg_c>::tuple_
   return apply_helper<arg_c>::apply<F,Args,arg_0>(f, args);
 }
 
+template< typename R, typename F, typename Args, size_t arg_0, size_t arg_c >
+R apply_func2( F& f, const Args& args) {
+  return apply_helper<arg_c>::apply<F,Args,arg_0>(f, args);
+}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -127,10 +115,8 @@ struct composed_traits2 {
 
 template<typename F, typename G0, typename G1, typename tuple_type>
 struct compound_result2_helper {
-  enum {
-    arity0 = function_traits<G0>::arity,
-    arity1 = function_traits<G1>::arity
-  };
+  static const size_t arity0 = function_traits<G0>::arity;
+  static const size_t arity1 = function_traits<G1>::arity;
   typedef typename apply_helper<arity0>::tuple_traits<G0,tuple_type,0>::type      U;
   typedef typename apply_helper<arity1>::tuple_traits<G1,tuple_type,arity0>::type V;
   typedef typename result2<F,U,V>::type type;
