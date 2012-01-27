@@ -97,6 +97,16 @@ public:
   auto operator()() -> typename compound_result0<F,G>::type { return f(g()); }
 };
 
+template<typename F, typename G>
+class composed<F,G,0,0> : public composed_base<F,G> {
+public:
+  composed(F f_,   G g_)   : composed_base<F,G>(f_,g_) { }
+  composed(F&& f_, G&& g_) : composed_base<F,G>(std::forward(f_),std::forward(g_)) { }
+
+  auto operator()() -> typename result0<F>::type { g(); return f(); }
+};
+
+
 }
 
 #endif /* FC_H */

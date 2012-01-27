@@ -50,7 +50,7 @@ struct function_traits< composed<F,G,ArgFC,ArgGC> > : public function_traits<G> 
 template <typename C, typename R>
 struct function_traits<R(C::*)() const> {
 	static const size_t arity = 0;
-	typedef decltype( std::declval<C>().operator()() ) result_type;
+	typedef R result_type;
 };
 
 template <typename C, typename R, typename T0>
@@ -82,6 +82,43 @@ struct function_traits<R(C::*)(T0,T1,T2,T3,T4) const> {
   static const size_t arity = 5;
   typedef R result_type;
 };
+
+template <typename C, typename R>
+struct function_traits<R(C::*)(void)> {
+  static const size_t arity = 0;
+  typedef R result_type;
+};
+
+template <typename C, typename R, typename T0>
+struct function_traits<R(C::*)(T0)> {
+  static const size_t arity = 1;
+  typedef R result_type;
+};
+
+template <typename C, typename R, typename T0, typename T1>
+struct function_traits<R(C::*)(T0,T1)> {
+  static const size_t arity = 2;
+  typedef R result_type;
+};
+
+template <typename C, typename R, typename T0, typename T1, typename T2>
+struct function_traits<R(C::*)(T0,T1,T2)> {
+  static const size_t arity = 3;
+  typedef R result_type;
+};
+
+template <typename C, typename R, typename T0, typename T1, typename T2, typename T3>
+struct function_traits<R(C::*)(T0,T1,T2,T3)> {
+  static const size_t arity = 4;
+  typedef R result_type;
+};
+
+template <typename C, typename R, typename T0, typename T1, typename T2, typename T3, typename T4>
+struct function_traits<R(C::*)(T0,T1,T2,T3,T4)> {
+  static const size_t arity = 5;
+  typedef R result_type;
+};
+
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -185,6 +222,7 @@ template<typename T>
 auto make_function(T *t) -> typename make_function_traits<T>::type {
 	return t;
 }
+
 
 }
 
