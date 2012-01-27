@@ -23,7 +23,7 @@ template<typename F, typename G0, typename G1, typename G2, size_t ArgGC> class 
 
 template <typename F, typename G0, typename G1, size_t ArgGC>
 struct function_traits< composed2<F,G0,G1,ArgGC> > {
-  enum { arity = function_traits<G0>::arity + function_traits<G1>::arity };
+  static const size_t arity = function_traits<G0>::arity + function_traits<G1>::arity;
 };
 
 template< size_t arg_c >

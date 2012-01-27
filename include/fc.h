@@ -39,9 +39,7 @@ inline auto operator+(F f, G g) -> typename composed_traits<F,G>::type {
 template<typename F, typename G>
 class composed_base {
 public:
-  enum {
-    arity = function_traits<G>::arity
-  };
+  static const size_t arity = function_traits<G>::arity;
 
   template< typename G2 >
   auto with(G2 g2) const -> typename composed_traits< typename composed_traits<F,G>::type, G2>::type {

@@ -37,8 +37,6 @@ public:
   static const size_t arity_0 = function_traits<G0>::arity;
   static const size_t arity_1 = function_traits<G1>::arity;
 
-
-
   template<typename R, typename Args>
   R applyToTuple(const Args& args) {
     return f(apply_func<G0,Args,0,      arity_0>(g,args),
