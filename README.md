@@ -1,7 +1,7 @@
 FunctionComposition
 =============
 
-FunctionComposition is a simple header-based C++ library for composing functions.
+FunctionComposition (fc) is a simple header-based C++ library for composing functions.
 
 It provides a simple and expressive way of combining program logic and routines, with 
 support for lambdas, function objects and pure functions.  
@@ -48,8 +48,8 @@ A more complicated example, without the (+) for composition:
 Documentation
 -------------
 
-Please see the file called INSTALL.  
-Several samples and tests are included with the source, which together with CMake can be built and run 
+Please see the file called INSTALL for usage details.  
+Several samples and tests are included with the source; together with CMake, these can be built and run 
 with any compatible compiler (developed with VC10, tested on GCC 4.6).  
 
 Licensing
