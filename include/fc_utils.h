@@ -21,7 +21,7 @@ namespace fc {
 
 ///////////////////////////////////////////////////////////////////////////
 
-template<typename F, typename G>              class composed_base;
+template<typename F, typename G>                             class composed_base;
 template<typename F, typename G, size_t ArgFC, size_t ArgGC> class composed;
 
 ///////////////////////////////////////////////////////////////////////////
@@ -85,6 +85,37 @@ struct function_traits<R(C::*)(T0,T1,T2,T3,T4) const> {
 
 ///////////////////////////////////////////////////////////////////////////
 
+#if defined(VC_VARIADIC)
+
+#if 0
+template <typename T>
+struct function_traits : public function_traits<decltype(&T::operator())> {};
+
+template <typename C, typename R, typename... Args>
+struct function_traits<R(C::*)(Args...) const> {
+  enum { arity = sizeof...(Args) };
+  typedef R result_type;
+};
+#endif
+
+template<typename... Args>
+struct results;
+
+template<typename F, typename... Args>
+struct results<F,Args...> {
+  typedef typename std::result_of< F(Args...) >::type type;
+};
+
+template<typename F, typename G, typename... Args>
+struct compound_result {
+  typedef typename results<G,Args...>::type U;
+  typedef typename results<F,U>::type type;
+};
+
+#else
+
+///////////////////////////////////////////////////////////////////////////
+
 template<typename F>
 struct result0 { typedef decltype( std::declval<F>().operator()() ) type; };
 
@@ -136,17 +167,12 @@ struct compound_result4 {
   typedef typename result1<F,U>::type type;
 };
 
-///////////////////////////////////////////////////////////////////////////
-
-template<typename Functor, size_t NArgs, typename Return>
-struct enable_if_arg : std::enable_if<function_traits<Functor>::arity==NArgs, Return> { };
-
-///////////////////////////////////////////////////////////////////////////
-
 template<typename F, typename G>
 struct composed_traits {
 	typedef composed<F,G,function_traits<F>::arity,function_traits<G>::arity> type;
 };
+
+#endif /* FC_VARIADIC */
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -161,6 +187,5 @@ auto make_function(T *t) -> typename make_function_traits<T>::type {
 }
 
 }
-
 
 #endif

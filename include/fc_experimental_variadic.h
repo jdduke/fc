@@ -8,7 +8,7 @@
 #define _FC_EXPERIMENTAL_VARIADIC_H_
 
 #include "fc_experimental_variadic_utils.h"
-#include "fc_variadic.h"
+#include "fc.h"
 
 namespace fc {
 
@@ -26,19 +26,14 @@ class composed_base2 : public composed_base<F,G0> {
 public:
   typedef composed_base<F,G0> parent_type;
 
-  enum {
-    arity_0 = parent_type::arity,
-    arity_1 = function_traits<G1>::arity,
-    arity_c = arity_0 + arity_1
-  };
+  static const size_t arity_0 = parent_type::arity;
+  static const size_t arity_1 = function_traits<G1>::arity;
+  static const size_t arity_c = arity_0 + arity_1;
 
   template<typename R, typename Args>
   inline R apply(Args args) {
     return f(apply_helper<arity_0>::apply<G0,Args,0      >(g, args),
              apply_helper<arity_1>::apply<G1,Args,arity_1>(g1,args));
-
-    /*return f(apply_func<G0,Args,0,      arity_0        >(g,args),
-      apply_func<G1,Args,arity_0,arity_0+arity_1>(g1,args));*/
   }
 
   template<typename... Args>

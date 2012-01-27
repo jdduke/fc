@@ -10,10 +10,6 @@
 #include <functional>
 #include <type_traits>
 
-#if defined(FC_VARIADIC)
-#include "fc_variadic.h"
-#else
-
 #if defined(FC_EXPERIMENTAL)
 #include "fc_experimental.h"
 #endif
@@ -46,6 +42,12 @@ public:
     return compose(compose(f,g), g2);
   }
 
+#if defined(VC_VARIADIC)
+  template<typename... Args>
+  auto operator()(Args... args) -> typename compound_result<F,G,Args...>::type {
+    return f(g(args...));
+  }
+#else
   template<typename T0>
   auto operator()(const T0& t) -> typename compound_result1<F,G,T0>::type {
     return f(g(t));
@@ -65,6 +67,7 @@ public:
   auto operator()(const T0& t0, const T1& t1, const T2& t2, const T3& t3) -> typename compound_result4<F,G,T0,T1,T2,T3>::type {
     return f(g(t0,t1,t2,t3));
   }
+#endif
 
 protected:
 
@@ -95,7 +98,5 @@ public:
 };
 
 }
-
-#endif /* FC_VARIADIC */
 
 #endif /* FC_H */
