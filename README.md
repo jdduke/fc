@@ -28,7 +28,8 @@ Documentation
 -------------
 
 Please see the file called INSTALL.  
-Several samples and tests are included with the source, which together with CMake can be built and run with any compatible compiler (guaranteed on VC10, tested on GCC 4.6).  
+Several samples and tests are included with the source, which together with CMake can be built and run 
+with any compatible compiler (developed with VC10, tested on GCC 4.6).  
 
 Licensing
 ---------
