@@ -10,6 +10,8 @@ support for lambdas, function objects and pure functions.
 Example
 -------------
 
+    using namespace fc;
+    
     auto sqare      = [](float x) { return x*x;           };
     auto halve      = [](float x) { return .5f*x;         };
     auto inv_square = [](float x) { return std::sqrtf(x); };
