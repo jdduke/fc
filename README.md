@@ -36,10 +36,12 @@ with any compatible compiler (developed with VC10, tested on GCC 4.6).
 Licensing
 ---------
 
+MIT.
 Please see the file called LICENSE.
 
 Contributions
 -------------
 
 This projet was loosely inspired by Eric Niebler's blog post "Fun with Function Composition" over at Expressive C++ 
-(http://cpp-next.com/archive/2010/11/expressive-c-fun-with-function-composition/)
+(http://cpp-next.com/archive/2010/11/expressive-c-fun-with-function-composition/).  Though useful, the syntax is 
+somewhat constraining and requires a tighter specification of the desired composition. 
