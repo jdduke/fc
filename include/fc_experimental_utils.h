@@ -133,6 +133,16 @@ struct compound_result20 {
   typedef typename compound_result2_helper<F,G0,G1,tuple_type>::type type;
 };
 
+#if defined(FC_VARIADIC)
+
+template<typename F, typename G0, typename G1, typename... Args>
+struct compound_result2 {
+  typedef std::tuple<Args...> tuple_type;
+  typedef typename compound_result2_helper<F,G0,G1,tuple_type>::type type;
+};
+
+#else
+
 template<typename F, typename G0, typename G1, typename T0>
 struct compound_result21 {
   typedef std::tuple<T0> tuple_type;
@@ -157,6 +167,8 @@ struct compound_result24 {
   typedef typename compound_result2_helper<F,G0,G1,tuple_type>::type type;
 };
 
+#endif
+
 ///////////////////////////////////////////////////////////////////////////
 
 template<typename F, typename G0, typename G1, typename G2>
@@ -179,6 +191,16 @@ struct compound_result30 {
   typedef void tuple_type;
   typedef typename compound_result3_helper<F,G0,G1,G2,tuple_type>::type type;
 };
+
+#if defined(FC_VARIADIC)
+
+template<typename F, typename G0, typename G1, typename G2, typename... Args>
+struct compound_result3 {
+  typedef std::tuple<Args...> tuple_type;
+  typedef typename compound_result3_helper<F,G0,G1,G2,tuple_type>::type type;
+};
+
+#else
 
 template<typename F, typename G0, typename G1, typename G2, typename T0>
 struct compound_result31 {
@@ -204,6 +226,7 @@ struct compound_result34 {
   typedef typename compound_result3_helper<F,G0,G1,G2,tuple_type>::type type;
 };
 
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 
