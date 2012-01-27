@@ -51,31 +51,31 @@ struct function_traits< composed<F,G,ArgFC,ArgGC> > : public function_traits<G> 
 
 template <typename C, typename R>
 struct function_traits<R(C::*)() const> {
-	enum { arity = 0 };
+	static const size_t arity;
 	typedef decltype( std::declval<C>().operator()() ) result_type;
 };
 
 template <typename C, typename R, typename T0>
 struct function_traits<R(C::*)(T0) const> {
-	enum { arity = 1 };
+	static const size_t arity = 1;
 	typedef R result_type;
 };
 
 template <typename C, typename R, typename T0, typename T1>
 struct function_traits<R(C::*)(T0,T1) const> {
-	enum { arity = 2 };
+	static const size_t arity = 2;
 	typedef R result_type;
 };
 
 template <typename C, typename R, typename T0, typename T1, typename T2>
 struct function_traits<R(C::*)(T0,T1,T2) const> {
-	enum { arity = 3 };
+	static const size_t arity = 3;
 	typedef R result_type;
 };
 
 template <typename C, typename R, typename T0, typename T1, typename T2, typename T3>
 struct function_traits<R(C::*)(T0,T1,T2,T3) const> {
-	enum { arity = 4 };
+	static const size_t arity = 4;
 	typedef R result_type;
 };
 

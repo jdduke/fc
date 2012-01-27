@@ -34,8 +34,12 @@ struct function_traits : public function_traits< decltype( &T::operator() ) > {}
 
 template <typename T0, typename T1>
 struct function_traits2 {
-  enum { arity = function_traits< decltype( &T0::operator() ) >::arity
-               + function_traits< decltype( &T1::operator() ) >::arity };
+  static const size_t arity = function_traits<T0>::arity + function_traits<T1>::arity;
+};
+
+template <typename T0, typename T1, typename T2>
+struct function_traits3 {
+  static const size_t arity = function_traits2<T0,T1>::arity + function_traits<T2>::arity;
 };
 
 template <typename F, typename G, size_t ArgFC, size_t ArgGC>
@@ -136,13 +140,6 @@ struct compound_result4 {
 
 template<typename Functor, size_t NArgs, typename Return>
 struct enable_if_arg : std::enable_if<function_traits<Functor>::arity==NArgs, Return> { };
-
-///////////////////////////////////////////////////////////////////////////
-
-template<typename F, typename G0 = std::function<void(void)>, typename G1 = G0, typename G2 = G0>
-struct arg_count {
-	enum { arity = function_traits<F>::arity + function_traits<G0>::arity + function_traits<G1>::arity + function_traits<G2>::arity };
-};
 
 ///////////////////////////////////////////////////////////////////////////
 

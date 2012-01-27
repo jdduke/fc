@@ -16,6 +16,11 @@ namespace fc {
 template<typename F, typename G0, typename G1>               class composed_base2;
 template<typename F, typename G0, typename G1, size_t ArgGC> class composed2;
 
+template<typename F, typename G0, typename G1, typename G2>               class composed_base3;
+template<typename F, typename G0, typename G1, typename G2, size_t ArgGC> class composed3;
+
+///////////////////////////////////////////////////////////////////////////
+
 template <typename F, typename G0, typename G1, size_t ArgGC>
 struct function_traits< composed2<F,G0,G1,ArgGC> > {
   enum { arity = function_traits<G0>::arity + function_traits<G1>::arity };
@@ -152,6 +157,12 @@ struct compound_result24 {
   typedef typename compound_result2_helper<F,G0,G1,tuple_type>::type type;
 };
 
+///////////////////////////////////////////////////////////////////////////
+
+template<typename F, typename G0, typename G1, typename G2>
+struct composed_traits3 {
+  typedef composed3<F,G0,G1,G2,function_traits3<G0,G1,G2>::arity> type;
+};
 
 ///////////////////////////////////////////////////////////////////////////
 
