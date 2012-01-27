@@ -10,6 +10,8 @@ support for lambdas, function objects and pure functions.
 Example
 -------------
 
+A simple example with lambdas, using the (+) operator for composition:
+
     using namespace fc;
     
     auto sqare      = [](float x) { return x*x;           };
@@ -24,6 +26,23 @@ Example
     assert(square_halve(6.f)     == 9.f);
     assert(inv_square_halve(9.f) == 6.f);
     assert(ident(10.0f)          == 10.0f);
+    
+A more complicated example, without the (+) for composition:
+
+    using namespace fc;
+    
+    // polar coordinate r = sqrt(x*x+y*y)
+    
+    auto r1 = compose(std::sqrtf, [](float x, float y) { return x*x + y*y; });
+    r1(1.f, 2.f);
+    
+    auto square = [](float x)          { return x*x; };
+    auto add    = [](float x, float y) { return x + y; };
+    auto sqrt   = [](float x)          { return std::sqrtf(x); };
+    
+    // r = f(g(h(x),h(y))) where f = sqrt, g = add, h = square
+    auto r2     = compose(sqrt, compose2(add, square, square));
+    r2(1.f, 2.f);
 
 
 Documentation
