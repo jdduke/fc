@@ -9,44 +9,42 @@ using namespace fc;
 /////////////////////////////////////////////////////////////////////////////
 
 template<typename A, typename B, typename C, typename D>
-void testNoArgs(A& a, B& b, C& c, D& d)
+void testNoArgs(A a_, B b_, C c_, D d_)
 {
-  //TODO: Decide if we want to support this kind of composition 
+  auto a = compose(a_,a_);
+  auto b = compose(b_,c_);
+  auto c = compose(c_,b_);
+  auto d = compose(d_,c_);
+
   a();
+  b();
   EXPECT_EQ(1.f, c(1.f));
   EXPECT_EQ(1.f, d());
   EXPECT_EQ(1.f, (d + a)());
 }
 
 TEST(SimpleNoArgs, Func) {
-  auto voidFunc  = compose(make_function(Void_Void),   make_function(Void_Void));
-  auto voidFunc2 = compose(make_function(Void_Float),  make_function(Float_Void));
-  auto voidFunc3 = compose(make_function(Float_Void),  make_function(Void_Float));
-  auto voidFunc4 = compose(make_function(Float_Float), make_function(Float_Void));
-  testNoArgs(voidFunc, voidFunc2, voidFunc3, voidFunc4);
+  testNoArgs(f(Void_Void), f(Void_Float), f(Float_Void), f(Float_Float));
 }
 
 TEST(SimpleNoArgs, FuncObj) {
-  auto voidFunc  = S_Void_Void()   + S_Void_Void();
-  auto voidFunc2 = S_Void_Float()  + S_Float_Void();
-  auto voidFunc3 = S_Float_Void()  + S_Void_Float();
-  auto voidFunc4 = S_Float_Float() + S_Float_Void();
-  testNoArgs(voidFunc, voidFunc2, voidFunc3, voidFunc4);
+  testNoArgs(s(Void_Void), s(Void_Float), s(Float_Void), s(Float_Float));
 }
 
 TEST(SimpleNoArgs, Lambda) {
-  auto voidFunc  = L_Void_Void   + L_Void_Void;
-  auto voidFunc2 = L_Void_Float  + L_Float_Void;
-  auto voidFunc3 = L_Float_Void  + L_Void_Float;
-  auto voidFunc4 = L_Float_Float + L_Float_Void;
-  testNoArgs(voidFunc, voidFunc2, voidFunc3, voidFunc4);
+  testNoArgs(l(Void_Void), l(Void_Float), l(Float_Void), l(Float_Float));
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 template<typename A, typename B, typename C, typename D>
-void testArgs(A& a, B& b, C& c, D& d)
+void testArgs(A a_, B b_, C c_, D d_)
 {
+  auto a = compose(a_,a_);
+  auto b = compose(a_,b_);
+  auto c = compose(a_,c_);
+  auto d = compose(a_,d_);
+
   EXPECT_EQ(1.f, a(1.f));
   EXPECT_EQ(2.f, b(1.f,1.f));
   EXPECT_EQ(3.f, c(1.f,1.f,1.f));
@@ -64,25 +62,13 @@ void testArgs(A& a, B& b, C& c, D& d)
 }
 
 TEST(SimpleMultipleArgs, Func) {
-  auto floatFunc  = compose(make_function(Float_Float),  make_function(Float_Float));
-  auto floatFunc2 = compose(make_function(Float_Float),  make_function(Float_Float2));
-  auto floatFunc3 = compose(make_function(Float_Float),  make_function(Float_Float3));
-  auto floatFunc4 = compose(make_function(Float_Float),  make_function(Float_Float4));
-  testArgs(floatFunc, floatFunc2, floatFunc3, floatFunc4);
+  testArgs(f(Float_Float), f(Float_Float2), f(Float_Float3), f(Float_Float4));
 }
 
 TEST(SimpleMultipleArgs, FuncObj) {
-  auto floatFunc  = S_Float_Float() + S_Float_Float();
-  auto floatFunc2 = S_Float_Float() + S_Float_Float2();
-  auto floatFunc3 = S_Float_Float() + S_Float_Float3();
-  auto floatFunc4 = S_Float_Float() + S_Float_Float4();
-  testArgs(floatFunc, floatFunc2, floatFunc3, floatFunc4);
+  testArgs(s(Float_Float), s(Float_Float2), s(Float_Float3), s(Float_Float4));
 }
 
 TEST(SimpleMultipleArgs, Lambda) {
-  auto floatFunc  = L_Float_Float + L_Float_Float;
-  auto floatFunc2 = L_Float_Float + L_Float_Float2;
-  auto floatFunc3 = L_Float_Float + L_Float_Float3;
-  auto floatFunc4 = L_Float_Float + L_Float_Float4;
-  testArgs(floatFunc, floatFunc2, floatFunc3, floatFunc4);
+  testArgs(l(Float_Float), l(Float_Float2), l(Float_Float3), l(Float_Float4));
 }

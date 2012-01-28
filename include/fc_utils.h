@@ -23,26 +23,41 @@ namespace fc {
 template<typename F, typename G>                             class composed_base;
 template<typename F, typename G, size_t ArgFC, size_t ArgGC> class composed;
 
+template<typename F, typename G, typename G1>               class composed_base2;
+template<typename F, typename G0, typename G1, size_t ArgG> class composed2;
+
+template<typename F, typename G, typename G1, typename G2>               class composed_base3;
+template<typename F, typename G0, typename G1, typename G2, size_t ArgG> class composed3;
+
 ///////////////////////////////////////////////////////////////////////////
 
 template <typename T> struct function_traits;
-template <typename T0, typename T1> struct function_traits2;
+template <typename T0, typename T1, typename T2> struct function_traits2;
+template <typename T0, typename T1, typename T2, typename T3> struct function_traits3;
 
 template <typename T>
 struct function_traits : public function_traits< decltype( &T::operator() ) > {};
 
-template <typename T0, typename T1>
+template <typename T0, typename T1, typename T2>
 struct function_traits2 {
-  static const size_t arity = function_traits<T0>::arity + function_traits<T1>::arity;
+  static const size_t arity = function_traits<T1>::arity + function_traits<T2>::arity;
+  typedef typename function_traits<T0>::result_type result_type;
 };
 
-template <typename T0, typename T1, typename T2>
+template <typename T0, typename T1, typename T2, typename T3>
 struct function_traits3 {
-  static const size_t arity = function_traits2<T0,T1>::arity + function_traits<T2>::arity;
+  static const size_t arity = function_traits2<T0,T1,T2>::arity + function_traits<T3>::arity;
+  typedef typename function_traits<T0>::result_type result_type;
 };
 
 template <typename F, typename G, size_t ArgFC, size_t ArgGC>
 struct function_traits< composed<F,G,ArgFC,ArgGC> > : public function_traits<G> {};
+
+template <typename F, typename G0, typename G1, size_t ArgG>
+struct function_traits< composed2<F,G0,G1,ArgG> > : public function_traits2<F,G0,G1> {};
+
+template <typename F, typename G0, typename G1, typename G2, size_t ArgG>
+struct function_traits< composed3<F,G0,G1,G2,ArgG> > : public function_traits3<F,G0,G1,G2> {};
 
 ///////////////////////////////////////////////////////////////////////////
 

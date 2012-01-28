@@ -22,10 +22,12 @@ template<typename F, typename G0, typename G1, typename G2, size_t ArgGC> class 
 
 ///////////////////////////////////////////////////////////////////////////
 
+/*
 template <typename F, typename G0, typename G1, size_t ArgGC>
 struct function_traits< composed2<F,G0,G1,ArgGC> > {
   static const size_t arity = function_traits<G0>::arity + function_traits<G1>::arity;
 };
+*/
 
 template< size_t arg_c >
 struct apply_helper {
@@ -114,7 +116,7 @@ R apply_func2( F& f, const Args& args) {
 
 template<typename F, typename G0, typename G1>
 struct composed_traits2 {
-  typedef composed2<F,G0,G1,function_traits2<G0,G1>::arity> type;
+  typedef composed2<F,G0,G1,function_traits2<F,G0,G1>::arity> type;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -174,7 +176,7 @@ struct compound_result24 {
 
 template<typename F, typename G0, typename G1, typename G2>
 struct composed_traits3 {
-  typedef composed3<F,G0,G1,G2,function_traits3<G0,G1,G2>::arity> type;
+  typedef composed3<F,G0,G1,G2,function_traits3<F,G0,G1,G2>::arity> type;
 };
 
 ///////////////////////////////////////////////////////////////////////////
