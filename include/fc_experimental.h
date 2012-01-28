@@ -7,10 +7,7 @@
 #ifndef _FC_EXPERIMENTAL_H_
 #define _FC_EXPERIMENTAL_H_
 
-#if defined(FC_VARIADIC)
-#include "fc_experimental_variadic.h"
-#else
-
+#include "fc_common.h"
 #include "fc_experimental_utils.h"
 
 namespace fc {
@@ -76,7 +73,7 @@ public:
     return applyToTuple<result_type>(std::make_tuple(t0,t1,t2,t3));
   }
 
-#endif
+#endif /* FC_VARIADIC */
 
 protected:
 
@@ -175,9 +172,6 @@ public:
   inline auto operator()() -> typename compound_result30<F,G0,G1,G2>::type { return f(g(),g1(),g3()); }
 };
 
+} /* namespace fc */
 
-}
-
-#endif /* FC_VARIADIC */
-
-#endif
+#endif /* _FC_EXPERIMENTAL_H_ */

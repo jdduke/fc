@@ -59,7 +59,7 @@ void test() {
     auto hfg3 = compose(h,f) + g;
     auto hfg4 = hf+g;
     auto hfg5 = h+f+g;
-    auto hfg6 = h+(compose(f,g));
+    auto hfg6 = h <o> f <o> g;
     auto hfg7 = (compose(h,f)+g);
     auto fffg  = (f+f).with(f).with(g);
     auto fffg2 = f+f+f+g;

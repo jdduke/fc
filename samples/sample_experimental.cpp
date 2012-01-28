@@ -74,17 +74,22 @@ float test_func3() {
   return std::logf(std::sqrtf(rand_gen() * rand_gen()));
 }
 
+float test_func4(float x) {
+  return ((((((((((((((((x + 2.f) - 3.f) * 4.f) / 5.f) + 2.f) - 3.f) * 4.f) / 5.f) + 2.f) - 3.f) * 4.f) / 5.f) + 2.f) - 3.f) * 4.f) / 5.f);
+}
+
 template<typename T, typename F>
 void benchmark(T& data, T& result, F f, const char* desc, size_t iters = VEC_ITERS) {
   timed_run timed(desc);
   for (size_t i = 0; i < iters; ++i)
-    transform_4(std::begin(data),
-    std::end(  data),
-    std::begin(data),
-    std::begin(data),
-    std::begin(data),
-    std::begin(result),
-    f);
+    transform_4(
+      std::begin(data),
+      std::end(  data),
+      std::begin(data),
+      std::begin(data),
+      std::begin(data),
+      std::begin(result),
+      f);
 }
 
 template<typename F>
@@ -92,6 +97,17 @@ void benchmark2(F f, const char* desc, size_t iters = VEC_ITERS) {
   timed_run timed(desc);
   for (size_t i = 0; i < iters; ++i)
     f();
+}
+
+template<typename T, typename F>
+void benchmark3(T& data, T& result, F f, const char* desc, size_t iters = VEC_ITERS) {
+  timed_run timed(desc);
+  for (size_t i = 0; i < iters; ++i)
+    transform(
+      std::begin(data),
+      std::end(  data),
+      std::begin(result),
+      f);
 }
 
 void test() {
@@ -111,6 +127,9 @@ void test() {
 
     std::vector<float> result(rand_vec.size());
     std::vector<float> test_result(rand_vec.size());
+
+    // warmup
+    benchmark(rand_vec, result,      test_lambda1, "Warmup - ");
 
     benchmark(rand_vec, result,      add_mult_mult, "COMPOSED: (x * y) + (z * w) - ");
     benchmark(rand_vec, result,      test_lambda1,  "LAMBDA:   (x * y) + (z * w) - ");
@@ -158,6 +177,27 @@ void test() {
     benchmark2(sqrt_mult_rand_rand2, "COMPOSED2: log(sqrt(rand()*rand())) - ", VEC_ITERS * 25);
     benchmark2(test_lambda3,         "LAMBDA:    log(sqrt(rand()*rand())) - ", VEC_ITERS * 25);
     benchmark2(test_func3,           "FUNC:      log(Sqrt(rand()*rand())) - ", VEC_ITERS * 25);
+
+    std::cout << "Success = " << std::equal( result.begin(), result.end(), test_result.begin() ) << std::endl;
+  }
+
+  {
+    auto add_2          = [](float x) -> float { return x + 2.f; };
+    auto sub_2          = [](float x) -> float { return x - 3.f; };
+    auto mult_2         = [](float x) -> float { return x * 4.f; };
+    auto div_2          = [](float x) -> float { return x / 5.f; };
+    auto chain          = div_2 + mult_2 + sub_2 + add_2;
+    auto chain4         = chain + chain + chain + chain;
+    auto test_lambda4   = [](float x) -> float {
+      return ((((((((((((((((x + 2.f) - 3.f) * 4.f) / 5.f) + 2.f) - 3.f) * 4.f) / 5.f) + 2.f) - 3.f) * 4.f) / 5.f) + 2.f) - 3.f) * 4.f) / 5.f);
+    };
+
+    std::vector<float> result(rand_vec.size());
+    std::vector<float> test_result(rand_vec.size());
+
+    benchmark3(rand_vec, result,      chain4,        "COMPOSED: (f(f(f(f(x)))) with f(x) = ((((x+2)-2)*2)/2) - ");
+    benchmark3(rand_vec, result,      test_lambda4,  "LAMBDA:   (f(f(f(f(x)))) with f(x) = ((((x+2)-2)*2)/2) - ");
+    benchmark3(rand_vec, test_result, test_func4,    "FUNC:     (f(f(f(f(x)))) with f(x) = ((((x+2)-2)*2)/2) - ");
 
     std::cout << "Success = " << std::equal( result.begin(), result.end(), test_result.begin() ) << std::endl;
   }

@@ -9,6 +9,7 @@
 
 #include <tuple>
 
+#include "fc_common.h"
 #include "fc_utils.h"
 
 namespace fc {
@@ -248,7 +249,6 @@ struct compund_result ## argc0 ## argc {                                        
   DEFINE_RESULT_HELPER_FUNC(argc, 4, typenames, types, )
 #endif
 
+} /* namespace fc */
 
-}
-
-#endif
+#endif /* _FC_EXPERIMENTAL_UTILS_H_ */

@@ -7,8 +7,7 @@
 #ifndef _FC_UTILS_H_
 #define _FC_UTILS_H_
 
-#include <functional>
-#include <type_traits>
+#include "fc_common.h"
 
 #if defined(_MSC_VER)
 namespace std {
@@ -223,7 +222,6 @@ auto make_function(T *t) -> typename make_function_traits<T>::type {
 	return t;
 }
 
+} /* namespace fc */
 
-}
-
-#endif
+#endif /* _FC_UTILS_H */
