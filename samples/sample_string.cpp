@@ -35,7 +35,7 @@ strings split(const string &s, char delim) {
   return split_helper(s, delim, elems);
 };
 
-auto filter = [=](strings elems) -> strings {
+auto filterlines = [=](strings elems) -> strings {
   strings filteredElems;
   std::copy_if(begin(elems), end(elems), back_inserter(filteredElems), [=](const std::string& s) {
     return s.size() < FilteredStringLength;
@@ -90,17 +90,17 @@ int main(int argc, char** argv) {
   static const std::string testInput = "one two fifty-fivehundred eight-thousand-ninety-nine ten 0 sixtyfivethousand";
 
   auto lines_inlines  = lines + make_function(inlines2);
-  auto unlines_filter = unlines + filter;
+  auto unlines_filter = unlines + filterlines;
   auto shortLines     = unlines_filter.with(lines_inlines);
   auto shortLines2    = unlines_filter + lines_inlines;
-  auto shortLines3    = make_function(unlines2) + filter + lines + inlines;
-  auto shortLines4    = (unlines + filter).with(lines + inlines);
+  auto shortLines3    = make_function(unlines2) + filterlines + lines + inlines;
+  auto shortLines4    = (unlines + filterlines).with(lines + inlines);
 
   auto print = [](std::string s) {
     std::cout << s << std::endl << std::endl;
   };
 
-  print( unlines(filter(lines(inlines(testInput)))));
+  print( unlines(filterlines(lines(inlines(testInput)))));
   print( shortLines (testInput) );
   print( shortLines2(testInput) );
   print( shortLines3(testInput) );

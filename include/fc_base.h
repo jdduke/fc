@@ -46,7 +46,6 @@ template<typename F, typename G>
 inline auto operator&(F f, G g) -> typename composed_traits<F,G>::type {
 	return compose(f,g);
 }
-
 #endif
 
 ///////////////////////////////////////////////////////////////////////////
