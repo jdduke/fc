@@ -12,7 +12,8 @@ template<typename A, typename B, typename C, typename D>
 void testNoArgs(A& a, B& b, C& c, D& d)
 {
   //TODO: Decide if we want to support this kind of composition 
-  //EXPECT_EQ(1.f, c(1.f));
+  a();
+  EXPECT_EQ(1.f, c(1.f));
   EXPECT_EQ(1.f, d());
   EXPECT_EQ(1.f, (d + a)());
 }

@@ -46,6 +46,7 @@ template<typename F, typename G>
 inline auto operator&(F f, G g) -> typename composed_traits<F,G>::type {
 	return compose(f,g);
 }
+
 #endif
 
 ///////////////////////////////////////////////////////////////////////////
@@ -53,7 +54,8 @@ inline auto operator&(F f, G g) -> typename composed_traits<F,G>::type {
 template<typename F, typename G>
 class composed_base {
 public:
-  static const size_t arity = function_traits<G>::arity;
+  static const size_t arity   = function_traits<G>::arity;
+  static const size_t f_arity = function_traits<F>::arity;
 
   template< typename G2 >
   auto with(G2 g2) const -> typename composed_traits< typename composed_traits<F,G>::type, G2>::type {
@@ -66,24 +68,25 @@ public:
     return f(g(args...));
   }
 #else
+
   template<typename T0>
-  auto operator()(const T0& t) -> typename compound_result1<F,G,T0>::type {
-    return f(g(t));
+  auto operator()(const T0& t) -> typename compound_result1<F,f_arity,G,T0>::type {
+    return compound_result1<F,f_arity,G,T0>::apply(f,g,t);
   }
 
   template<typename T0, typename T1>
-  auto operator()(const T0& t0, const T1& t1) -> typename compound_result2<F,G,T0,T1>::type {
-    return f(g(t0,t1));
+  auto operator()(const T0& t0, const T1& t1) -> typename compound_result2<F,f_arity,G,T0,T1>::type {
+    return compound_result2<F,f_arity,G,T0,T1>::apply(f,g,t0,t1);
   }
 
   template<typename T0, typename T1, typename T2>
-  auto operator()(const T0& t0, const T1& t1, const T2& t2) -> typename compound_result3<F,G,T0,T1,T2>::type {
-    return f(g(t0,t1,t2));
+  auto operator()(const T0& t0, const T1& t1, const T2& t2) -> typename compound_result3<F,f_arity,G,T0,T1,T2>::type {
+    return compound_result3<F,f_arity,G,T0,T1,T2>::apply(f,g,t0,t1,t2);
   }
 
   template<typename T0, typename T1, typename T2, typename T3>
-  auto operator()(const T0& t0, const T1& t1, const T2& t2, const T3& t3) -> typename compound_result4<F,G,T0,T1,T2,T3>::type {
-    return f(g(t0,t1,t2,t3));
+  auto operator()(const T0& t0, const T1& t1, const T2& t2, const T3& t3) -> typename compound_result4<F,f_arity,G,T0,T1,T2,T3>::type {
+    return compound_result4<F,f_arity,G,T0,T1,T2,T3>::apply(f,g,t0,t1,t2,t3);
   }
 #endif
 
@@ -112,7 +115,7 @@ public:
   composed(F f_,   G g_)   : composed_base<F,G>(f_,g_) { }
   composed(F&& f_, G&& g_) : composed_base<F,G>(std::forward(f_),std::forward(g_)) { }
 
-  auto operator()() -> typename compound_result0<F,G>::type { return f(g()); }
+  auto operator()() -> typename compound_result0<F,ArgFC,G>::type { return f(g()); }
 };
 
 template<typename F, typename G>

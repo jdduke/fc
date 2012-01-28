@@ -10,8 +10,12 @@ struct S_Float_Void { float operator()() { return Float_Void(); } };
 auto   L_Float_Void = []() { return Float_Void(); };
 
 inline void  Void_Float (float x) { x = 1.f; }
-struct S_Void_Float { float operator()(float x) { Void_Float(x); } };
+struct S_Void_Float { void operator()(float x) { Void_Float(x); } };
 auto   L_Void_Float = [](float x) { Void_Float(x); };
+
+inline void Void_Float2 (float x, float y) { Void_Float(x); Void_Float(y); }
+struct S_Void_Float2 { void operator()(float x, float y) { Void_Float2(x,y); } };
+auto   L_Void_Float2 = [](float x, float y) { Void_Float2(x,y); };
 
 inline float Float_Float (float x) { return x; }
 struct S_Float_Float { float operator()(float x) { return Float_Float(x); } };

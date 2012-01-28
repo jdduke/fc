@@ -10,37 +10,29 @@ using namespace fc;
 
 ///////////////////////////////////////////////////////////////////////////
 
-template<typename A, typename B, typename C, typename D>
-inline void testNoArgs(A& a, B& b, C& c, D& d)
+template<typename A, typename B>
+inline void testNoArgs(A& a, B& b)
 {
-  // TODO: This should compile properly
-  //EXPECT_EQ(1.f, voidFunc3(1.f));
-  EXPECT_EQ(1.f, d());
-  EXPECT_EQ(1.f, (d + a)());
+  EXPECT_EQ(2.f, b());
+  EXPECT_EQ(2.f, (b + a)());
 }
 
 TEST(CompoundNoArgs, Func) {
-  auto voidFunc  = compose(make_function(Void_Void),  make_function(Void_Void));
-  auto voidFunc2 = compose(make_function(Void_Float), make_function(Float_Void));
-  auto voidFunc3 = compose(make_function(Float_Void), make_function(Void_Float));
-  auto voidFunc4 = compose(make_function(Float_Float), make_function(Float_Void));
-  testNoArgs(voidFunc, voidFunc2, voidFunc3, voidFunc4);
+  auto voidFuncA = compose2(make_function(Void_Float2), make_function(Float_Void), make_function(Float_Void));
+  auto voidFuncB = compose2(make_function(Float_Float2), make_function(Float_Void), make_function(Float_Void));
+  testNoArgs(voidFuncA, voidFuncB);
 }
 
 TEST(CompoundNoArgs, FuncObj) {
-  auto voidFunc  = S_Void_Void()   + S_Void_Void();
-  auto voidFunc2 = S_Void_Float()  + S_Float_Void();
-  auto voidFunc3 = S_Float_Void()  + S_Void_Float();
-  auto voidFunc4 = S_Float_Float() + S_Float_Void();
-  testNoArgs(voidFunc, voidFunc2, voidFunc3, voidFunc4);
+  auto voidFuncA = compose2(S_Void_Float2(),  S_Float_Void(), S_Float_Void());
+  auto voidFuncB = compose2(S_Float_Float2(), S_Float_Void(), S_Float_Void());
+  testNoArgs(voidFuncA, voidFuncB);
 }
 
 TEST(CompoundNoArgs, Lambda) {
-  auto voidFunc  = L_Void_Void   + L_Void_Void;
-  auto voidFunc2 = L_Void_Float  + L_Float_Void;
-  auto voidFunc3 = L_Float_Void  + L_Void_Float;
-  auto voidFunc4 = L_Float_Float + L_Float_Void;
-  testNoArgs(voidFunc, voidFunc2, voidFunc3, voidFunc4);
+  auto voidFuncA = compose2(L_Void_Float2,  L_Float_Void, L_Float_Void);
+  auto voidFuncB = compose2(L_Float_Float2, L_Float_Void, L_Float_Void);
+  testNoArgs(voidFuncA, voidFuncB);
 }
 
 ///////////////////////////////////////////////////////////////////////////
