@@ -268,42 +268,6 @@ auto make_function(T *t) -> typename make_function_traits<T>::type {
 
 ///////////////////////////////////////////////////////////////////////////
 
-
-template<typename F, typename T>
-struct map {
-  map(F f_) : f(f_) { }
-  T operator()(const T& t) {
-    T result(t.size());
-    std::transform(std::begin(t), std::end(t), std::begin(result), f);
-    return result;
-  }
-};
-
-template<typename F, typename T>
-struct fold {
-  typedef typename T::value_type value_type;
-  fold(F f_) : f(f_) { }
-  T operator()(const T& t, value_type t0 = value_type()) {
-    return std::accumulate(std::begin(t), std::end(t), t0, f);
-  }
-};
-
-template<typename F, typename T>
-struct filter {
-  typedef typename T::value_type value_type;
-  filter(F f_) : f(f_) { }
-  T operator()(const T& t) {
-    T result;
-    auto back = std::back_inserter(result);
-    return std::for_each(std::begin(t), std::end(t), [&,this](const value_type& t) {
-      if (f(t)) back = t;
-    });
-    return result;
-  }
-};
-
-///////////////////////////////////////////////////////////////////////////
-
 } /* namespace fc */
 
 #endif /* _FC_UTILS_H */
