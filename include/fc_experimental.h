@@ -40,7 +40,7 @@ public:
       apply_func<G1,Args,arity_0,arity_1>(g1,args));
   }
 
-#if defined(FC_VARIADIC)
+#if FC_VARIADIC
 
   template<typename... Args>
   auto operator()(Args... args) -> typename compound_result2<F,G0,G1,Args...>::type {
@@ -118,10 +118,20 @@ public:
   R applyToTuple(const Args& args) {
     return f(apply_func<G0,Args,0,              arity_0>(g,args),
              apply_func<G1,Args,arity_0,        arity_1>(g1,args),
-             apply_func<G1,Args,arity_0+arity_1,arity_2>(g2,args),);
+             apply_func<G2,Args,arity_0+arity_1,arity_2>(g2,args));
   }
 
-  template<typename T0>
+
+#if FC_VARIADIC
+
+  template<typename... Args>
+  auto operator()(Args... args) -> typename compound_result3<F,G0,G1,G2,Args...>::type {
+    return apply<typename compound_result3<F,G0,G1,G2,Args...>::type>(std::make_tuple(args...));
+  }
+
+#else
+
+  template <typename T0>
   auto operator()(const T0& t) -> typename compound_result31<F,G0,G1,G2,T0>::type {
     typedef typename compound_result31<F,G0,G1,G2,T0>::type result_type;
     return applyToTuple<result_type>(std::make_tuple(t0));
@@ -144,6 +154,8 @@ public:
     typedef typename compound_result34<F,G0,G1,G2,T0,T1,T2,T3>::type result_type;
     return applyToTuple<result_type>(std::make_tuple(t0,t1,t2,t3));
   }
+
+#endif /* FC_VARIADIC */
 
 protected:
 

@@ -22,13 +22,6 @@ template<typename F, typename G0, typename G1, typename G2, size_t ArgGC> class 
 
 ///////////////////////////////////////////////////////////////////////////
 
-/*
-template <typename F, typename G0, typename G1, size_t ArgGC>
-struct function_traits< composed2<F,G0,G1,ArgGC> > {
-  static const size_t arity = function_traits<G0>::arity + function_traits<G1>::arity;
-};
-*/
-
 template< size_t arg_c >
 struct apply_helper {
 
@@ -136,7 +129,7 @@ struct compound_result20 {
   typedef typename compound_result2_helper<F,G0,G1,tuple_type>::type type;
 };
 
-#if defined(FC_VARIADIC)
+#if FC_VARIADIC
 
 template<typename F, typename G0, typename G1, typename... Args>
 struct compound_result2 {
@@ -195,7 +188,7 @@ struct compound_result30 {
   typedef typename compound_result3_helper<F,G0,G1,G2,tuple_type>::type type;
 };
 
-#if defined(FC_VARIADIC)
+#if FC_VARIADIC
 
 template<typename F, typename G0, typename G1, typename G2, typename... Args>
 struct compound_result3 {

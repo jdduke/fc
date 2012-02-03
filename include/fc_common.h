@@ -10,6 +10,14 @@
 #include <functional>
 #include <type_traits>
 
+#if defined(_MSC_VER)
+#define FC_DECLVAL  0
+#define FC_VARIADIC 0
+#else
+#define FC_DECLVAL  1
+#define FC_VARIADIC 1
+#endif
+
 #if !defined(FC_OPERATORS)
 #define FC_OPERATORS 1
 #endif
